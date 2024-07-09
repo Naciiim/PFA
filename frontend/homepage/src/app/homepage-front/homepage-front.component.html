@@ -1,0 +1,133 @@
+<div class="bg-blue-700 p-4">
+  <div class="container mx-auto">
+    <div class="flex items-center">
+      <img src="assets/logo.png" alt="Logo" class="h-8 w-8">
+      <span class="ml-2 text-white font-bold text-xl">Bank of Africa</span>
+    </div>
+  </div>
+</div>
+
+<div class="container mx-auto p-4">
+  <form (submit)="onSearch()" class="mb-4 flex space-x-4">
+    <div>
+      <label for="transactionId" class="block text-gray-700">ID de Transaction</label>
+      <input type="text" id="transactionId" [(ngModel)]="transactionId" name="transactionId" class="border p-2 w-full">
+    </div>
+    <div>
+      <label for="ref" class="block text-gray-700">Réf</label>
+      <input type="text" id="ref" [(ngModel)]="ref" name="ref" pattern="^[A-Z]{3}24k\d{7}$" class="border p-2 w-full">
+    </div>
+    <div>
+      <label for="event" class="block text-gray-700">Événement</label>
+      <input type="text" id="event" [(ngModel)]="event" name="event" pattern="^[A-Z]{2}\d{5}$" class="border p-2 w-full">
+    </div>
+    <div class="self-end">
+      <button type="submit" class="bg-blue-500 text-white p-2 rounded">Rechercher</button>
+    </div>
+  </form>
+
+  <div *ngIf="errorMessage" class="text-red-500 mb-4">{{ errorMessage }}</div>
+  <div *ngIf="warningMessages.length > 0" class="text-yellow-500 mb-4">
+    <ul>
+      <li *ngFor="let warning of warningMessages">{{ warning }}</li>
+    </ul>
+  </div>
+
+  <div class="flex justify-end mb-2">
+    <button class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600" (click)="exportAll()">Exporter tous</button>
+  </div>
+
+  <!-- Postings -->
+  <div *ngIf="searchResults.postings.length > 0" class="mt-4">
+    <div id="tab-postings" class="mb-4">
+      <h2 class="text-lg font-bold mb-2">Postings</h2>
+      <div class="flex justify-end mb-2">
+        <button class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600" (click)="exportPostings()" >Exporter</button>
+      </div>
+      <table class="min-w-full bg-white border">
+        <thead>
+        <tr>
+          <th class="py-2 px-4 border-b text-center">Transaction ID</th>
+          <th class="py-2 px-4 border-b text-center">Date de Transaction</th>
+          <th class="py-2 px-4 border-b text-center">Compte Débité</th>
+          <th class="py-2 px-4 border-b text-center">Compte Crédité</th>
+          <th class="py-2 px-4 border-b text-center">Statut</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let posting of searchResults.postings">
+          <td class="py-2 px-4 border-b text-center">{{ posting.transactionId }}</td>
+          <td class="py-2 px-4 border-b text-center">{{ posting.transactionDate }}</td>
+          <td class="py-2 px-4 border-b text-center">{{ posting.debitAccount }}</td>
+          <td class="py-2 px-4 border-b text-center">{{ posting.creditAccount }}</td>
+          <td class="py-2 px-4 border-b text-center">{{ posting.status }}</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Mouvements -->
+  <div *ngIf="searchResults.mouvements.length > 0" class="mt-4">
+    <div id="tab-mouvements" class="mb-4">
+      <h2 class="text-lg font-bold mb-2">Mouvements</h2>
+      <div class="flex justify-end mb-2">
+        <button class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600" (click)="exportMouvements()" >Exporter</button>
+      </div>
+      <table class="min-w-full bg-white border">
+        <thead>
+        <tr>
+          <th class="py-2 px-4 border-b text-center">Transaction ID</th>
+          <th class="py-2 px-4 border-b text-center">Ref</th>
+          <th class="py-2 px-4 border-b text-center">Montant</th>
+          <th class="py-2 px-4 border-b text-center">Date</th>
+          <th class="py-2 px-4 border-b text-center">Event</th>
+          <th class="py-2 px-4 border-b text-center">Statut</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let mouvement of searchResults.mouvements">
+          <td class="py-2 px-4 border-b text-center">{{ mouvement.transactionId }}</td>
+          <td class="py-2 px-4 border-b text-center">{{ mouvement.ref }}</td>
+          <td class="py-2 px-4 border-b text-center">{{ mouvement.amount }}</td>
+          <td class="py-2 px-4 border-b text-center">{{ mouvement.date }}</td>
+          <td class="py-2 px-4 border-b text-center">{{ mouvement.event }}</td>
+          <td class="py-2 px-4 border-b text-center">{{ mouvement.status }}</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- CRes -->
+  <div *ngIf="searchResults.cres.length > 0" class="mt-4">
+    <div id="tab-cres" class="mb-4">
+      <h2 class="text-lg font-bold mb-2">CRes</h2>
+      <div class="flex justify-end mb-2">
+        <button class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600" (click)="exportCres()" >Exporter</button>
+      </div>
+      <table class="min-w-full bg-white border">
+        <thead>
+        <tr>
+          <th class="py-2 px-4 border-b text-center">Payment ID</th>
+          <th class="py-2 px-4 border-b text-center">Transaction ID</th>
+          <th class="py-2 px-4 border-b text-center">Methode</th>
+          <th class="py-2 px-4 border-b text-center">Date</th>
+          <th class="py-2 px-4 border-b text-center">Event</th>
+          <th class="py-2 px-4 border-b text-center">Statut</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let cre of searchResults.cres">
+          <td class="py-2 px-4 border-b text-center">{{ cre.paymentId }}</td>
+          <td class="py-2 px-4 border-b text-center">{{ cre.transactionId }}</td>
+          <td class="py-2 px-4 border-b text-center">{{ cre.method }}</td>
+          <td class="py-2 px-4 border-b text-center">{{ cre.date }}</td>
+          <td class="py-2 px-4 border-b text-center">{{ cre.event }}</td>
+          <td class="py-2 px-4 border-b text-center">{{ cre.status }}</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
