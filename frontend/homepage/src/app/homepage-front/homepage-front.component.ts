@@ -38,6 +38,32 @@ export class HomepageFrontComponent {
     private mouvementService: MouvementService,
     private exportService: ExportService
   ) {}
+  ngOnInit(): void {
+    // Charger les postings avec un statut différent de 'T' au chargement du composant
+    this.loadInvalidPostings();
+  }
+  loadInvalidPostings() {
+    this.postingService.getInvalidPostings().pipe(
+      catchError(error => {
+        this.errorMessage = 'Erreur lors de la récupération des données.';
+        return throwError(error);
+      })
+    ).subscribe(
+      (response: any) => {
+        console.log('Réponse reçue :', response);
+        if (response && response.postings) {
+          this.postings = response.postings;
+        } else {
+          console.error('Réponse vide ou invalide reçue :', response);
+          this.errorMessage = 'Erreur : Réponse vide ou invalide.';
+        }
+      },
+      error => {
+        console.error('Erreur lors de la récupération des données :', error);
+        this.errorMessage = 'Erreur lors de la récupération des données.';
+      }
+    );
+  }
 
   onSearch() {
     this.errorMessage = '';
@@ -190,6 +216,7 @@ export class HomepageFrontComponent {
       document.body.removeChild(a);
     });
   }
+
   exportAll() {
     this.exportService.exportAll(this.transactionId).subscribe(blob => {
       const url = window.URL.createObjectURL(blob);

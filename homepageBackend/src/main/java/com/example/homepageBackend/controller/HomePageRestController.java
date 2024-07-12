@@ -1,13 +1,12 @@
 package com.example.homepageBackend.controller;
 
-import com.example.homepageBackend.service.HomepageService;
+import com.example.homepageBackend.model.dto.PostingDTO;
+import com.example.homepageBackend.model.entity.Posting;
+import com.example.homepageBackend.service.HomePageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestController
@@ -16,22 +15,12 @@ import java.util.Map;
 public class HomePageRestController {
 
     @Autowired
-    private HomepageService homepageService;
-    private static final Logger logger = LoggerFactory.getLogger(HomePageRestController.class);
+    private HomePageService homepageService;
 
-    @GetMapping("/validate")
-    public ResponseEntity<Map<String, Object>> validateAndRetrieveData(@RequestParam(required = false) String transactionId,
-                                                                       @RequestParam(required = false) String ref,
-                                                                       @RequestParam(required = false) String event) {
-        logger.info("Requête reçue avec transactionId={}, ref={}, event={}", transactionId, ref, event);
-
-        if ((transactionId == null || transactionId.isEmpty()) && (ref == null || ref.isEmpty())) {
-            Map<String, Object> response = new LinkedHashMap<>();
-            response.put("error", "Erreur: Vous devez fournir soit transactionId soit ref.");
-            return ResponseEntity.badRequest().body(response);
-        }
-
-        Map<String, Object> response = homepageService.validateAndRetrieveData(transactionId, ref, event);
+    @GetMapping("/getPosting")
+    public ResponseEntity<Map<String, Object>> getPostings(@RequestBody PostingDTO posting) {
+        System.out.println("Received DTO: " + posting);
+        Map<String, Object> response = homepageService.validateAndRetrieveData(posting);
         return ResponseEntity.ok(response);
     }
 }

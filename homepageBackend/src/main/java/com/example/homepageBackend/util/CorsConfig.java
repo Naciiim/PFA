@@ -1,4 +1,4 @@
-package com.example.homepageBackend.configuration;
+package com.example.homepageBackend.util;
 
 
 import org.springframework.context.annotation.Bean;

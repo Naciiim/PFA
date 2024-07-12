@@ -1,12 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import {Observable, of} from 'rxjs';
 import { PostingModel } from '../models/posting.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PostingService {
+  private searchResults: { postings: PostingModel[] } = {
+    postings: []
+  };
 
   private baseUrl = 'http://localhost:8080';
 
@@ -23,5 +26,9 @@ export class PostingService {
 
     return this.http.get<PostingModel[]>(`${this.baseUrl}/api/validate`, { params: httpParams });
   }
+  getInvalidPostings(): Observable<PostingModel[]> {
 
+    return of(this.searchResults.postings);
+  }
 }
+

@@ -1,0 +1,17 @@
+<ul class="bg-white shadow overflow-hidden sm:rounded-md max-w-sm mx-auto mt-16">
+  <li *ngFor="let posting of invalidPostings" class="border-t border-gray-200">
+    <div class="px-4 py-5 sm:px-6">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg leading-6 font-medium text-gray-900">Transaction ID: {{ posting.transactionId }}</h3>
+      </div>
+      <div class="mt-4 flex items-center justify-between">
+        <p class="text-sm font-medium text-gray-500">Status:
+          <span [ngClass]="{
+            'text-red-600': posting.status === 'N',
+            'text-yellow-600': posting.status === 'M'
+          }">{{ posting.status }}</span>
+        </p>
+      </div>
+    </div>
+  </li>
+</ul>
