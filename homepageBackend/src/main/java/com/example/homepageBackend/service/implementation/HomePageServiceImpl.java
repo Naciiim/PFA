@@ -1,7 +1,7 @@
-package com.example.homepageBackend.service;
+package com.example.homepageBackend.service.implementation;
 
 import com.example.homepageBackend.model.dto.PostingDTO;
-import com.example.homepageBackend.service.implementation.PostingServiceImpl;
+import com.example.homepageBackend.service.interfaces.HomePageService;
 import com.example.homepageBackend.util.FileHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,9 +14,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class HomePageService {
+public class HomePageServiceImpl implements HomePageService {
 
-    private static final Logger logger = LoggerFactory.getLogger(HomePageService.class);
+    private static final Logger logger = LoggerFactory.getLogger(HomePageServiceImpl.class);
 
     @Autowired
     private PostingServiceImpl postingServiceImpl;
@@ -24,6 +24,7 @@ public class HomePageService {
     @Autowired
     private FileHandler fileHandler;
 
+ @Override
     public Map<String, Object> validateAndRetrieveData(PostingDTO posting) {
         Map<String, Object> response = new LinkedHashMap<>();
 

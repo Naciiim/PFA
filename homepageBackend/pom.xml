@@ -61,12 +61,7 @@
 				<artifactId>mapstruct</artifactId>
 				<version>1.4.1.Final</version>
 			</dependency>
-			<dependency>
-				<groupId>org.mapstruct</groupId>
-				<artifactId>mapstruct-processor</artifactId>
-				<version>1.4.1.Final</version>
-				<scope>provided</scope>
-			</dependency>
+
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
@@ -83,6 +78,9 @@
 			<version>1.4.1.Final</version>
 			<scope>provided</scope>
 		</dependency>
+
+
+
 	</dependencies>
 
 	<build>
