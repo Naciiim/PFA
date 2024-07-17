@@ -6,127 +6,36 @@
     </div>
   </div>
 </div>
+
+<!-- Zone de recherche -->
 <div class="container mx-auto p-4">
-  <form (submit)="onSearch()" class="mb-4 flex space-x-4">
+  <form (submit)="searchPostings()" class="mb-4 flex space-x-4">
     <div>
-      <label for="transactionId" class="block text-gray-700">ID de Transaction</label>
-      <input type="text" id="transactionId" [(ngModel)]="transactionId" name="transactionId" class="border p-2 w-full">
-    </div>
-    <div>
-      <label for="ref" class="block text-gray-700">Réf</label>
-      <input type="text" id="ref" [(ngModel)]="ref" name="ref" pattern="^[A-Z]{3}24k\d{7}$" class="border p-2 w-full">
-    </div>
-    <div>
-      <label for="event" class="block text-gray-700">Événement</label>
-      <input type="text" id="event" [(ngModel)]="event" name="event" pattern="^[A-Z]{2}\d{5}$" class="border p-2 w-full">
+      <label for="transactionId" class="block text-sm font-medium text-gray-700">ID de transaction</label>
+      <input type="text" id="transactionId" [(ngModel)]="transactionid" name="transactionId" class="mt-1 border-gray-300 border p-2 w-full">
     </div>
     <div class="self-end">
-      <button type="submit" class="bg-blue-500 text-white p-2 rounded">Rechercher</button>
+      <button type="submit" class="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Rechercher</button>
     </div>
   </form>
-
-  <div *ngIf="errorMessage" class="text-red-500 mb-4">{{ errorMessage }}</div>
-  <div *ngIf="warningMessages.length > 0" class="text-yellow-500 mb-4">
-    <ul>
-      <li *ngFor="let warning of warningMessages">{{ warning }}</li>
-    </ul>
-  </div>
-
-  <div class="flex justify-end mb-2">
-    <button class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600" (click)="exportAll()">Exporter tous</button>
-  </div>
-  <app-invalid-postings-list [invalidPostings]="searchResults.postings"></app-invalid-postings-list>
-  <!-- Postings -->
-  <div *ngIf="searchResults.postings.length > 0" class="mt-4">
-    <div id="tab-postings" class="mb-4">
-      <h2 class="text-lg font-bold mb-2">Postings</h2>
-      <div class="flex justify-end mb-2">
-        <button class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600" (click)="exportPostings()" >Exporter</button>
-      </div>
-      <table class="min-w-full bg-white border">
-        <thead>
-        <tr>
-          <th class="py-2 px-4 border-b text-center">Transaction ID</th>
-          <th class="py-2 px-4 border-b text-center">Date de Transaction</th>
-          <th class="py-2 px-4 border-b text-center">Compte Débité</th>
-          <th class="py-2 px-4 border-b text-center">Compte Crédité</th>
-          <th class="py-2 px-4 border-b text-center">Statut</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr *ngFor="let posting of searchResults.postings">
-          <td class="py-2 px-4 border-b text-center">{{ posting.transactionId }}</td>
-          <td class="py-2 px-4 border-b text-center">{{ posting.transactionDate }}</td>
-          <td class="py-2 px-4 border-b text-center">{{ posting.debitAccount }}</td>
-          <td class="py-2 px-4 border-b text-center">{{ posting.creditAccount }}</td>
-          <td class="py-2 px-4 border-b text-center">{{ posting.status }}</td>
-        </tr>
-        </tbody>
-      </table>
+  <div *ngIf="errorMessage" id="alert-border-2" class="flex items-center p-4 mb-4 text-red-800 border-t-4 border-red-300 bg-red-50 dark:text-red-400 dark:bg-gray-800 dark:border-red-800" role="alert">
+    <svg class="flex-shrink-0 w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+      <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+    </svg>
+    <div class="ms-3 text-sm font-medium">
+      {{ errorMessage }}
     </div>
-  </div>
-
-  <!-- Mouvements -->
-  <div *ngIf="searchResults.mouvements.length > 0" class="mt-4">
-    <div id="tab-mouvements" class="mb-4">
-      <h2 class="text-lg font-bold mb-2">Mouvements</h2>
-      <div class="flex justify-end mb-2">
-        <button class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600" (click)="exportMouvements()" >Exporter</button>
-      </div>
-      <table class="min-w-full bg-white border">
-        <thead>
-        <tr>
-          <th class="py-2 px-4 border-b text-center">Transaction ID</th>
-          <th class="py-2 px-4 border-b text-center">Ref</th>
-          <th class="py-2 px-4 border-b text-center">Montant</th>
-          <th class="py-2 px-4 border-b text-center">Date</th>
-          <th class="py-2 px-4 border-b text-center">Event</th>
-          <th class="py-2 px-4 border-b text-center">Statut</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr *ngFor="let mouvement of searchResults.mouvements">
-          <td class="py-2 px-4 border-b text-center">{{ mouvement.transactionId }}</td>
-          <td class="py-2 px-4 border-b text-center">{{ mouvement.ref }}</td>
-          <td class="py-2 px-4 border-b text-center">{{ mouvement.amount }}</td>
-          <td class="py-2 px-4 border-b text-center">{{ mouvement.date }}</td>
-          <td class="py-2 px-4 border-b text-center">{{ mouvement.event }}</td>
-          <td class="py-2 px-4 border-b text-center">{{ mouvement.status }}</td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- CRes -->
-  <div *ngIf="searchResults.cres.length > 0" class="mt-4">
-    <div id="tab-cres" class="mb-4">
-      <h2 class="text-lg font-bold mb-2">CRes</h2>
-      <div class="flex justify-end mb-2">
-        <button class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600" (click)="exportCres()" >Exporter</button>
-      </div>
-      <table class="min-w-full bg-white border">
-        <thead>
-        <tr>
-          <th class="py-2 px-4 border-b text-center">Payment ID</th>
-          <th class="py-2 px-4 border-b text-center">Transaction ID</th>
-          <th class="py-2 px-4 border-b text-center">Methode</th>
-          <th class="py-2 px-4 border-b text-center">Date</th>
-          <th class="py-2 px-4 border-b text-center">Event</th>
-          <th class="py-2 px-4 border-b text-center">Statut</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr *ngFor="let cre of searchResults.cres">
-          <td class="py-2 px-4 border-b text-center">{{ cre.paymentId }}</td>
-          <td class="py-2 px-4 border-b text-center">{{ cre.transactionId }}</td>
-          <td class="py-2 px-4 border-b text-center">{{ cre.method }}</td>
-          <td class="py-2 px-4 border-b text-center">{{ cre.date }}</td>
-          <td class="py-2 px-4 border-b text-center">{{ cre.event }}</td>
-          <td class="py-2 px-4 border-b text-center">{{ cre.status }}</td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
+    <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-red-50 text-red-500 rounded-lg focus:ring-2 focus:ring-red-400 p-1.5 hover:bg-red-200 inline-flex items-center justify-center h-8 w-8 dark:bg-gray-800 dark:text-red-400 dark:hover:bg-gray-700" (click)="dismissError()">
+      <span class="sr-only">Dismiss</span>
+      <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+      </svg>
+    </button>
   </div>
 </div>
+
+<!-- Affichage des postings par défaut -->
+<app-default-postings *ngIf="!(transactionid && transactionid.length > 0) && defaultPostings.length > 0 && transactionPostings.length === 0" [postings]="defaultPostings"></app-default-postings>
+
+<!-- Affichage des postings de la transaction -->
+<app-transaction-postings *ngIf="transactionPostings.length > 0" [postings]="transactionPostings"></app-transaction-postings>

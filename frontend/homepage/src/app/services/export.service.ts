@@ -1,29 +1,21 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { Posting } from '../models/posting.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ExportService {
-
-  private baseUrl = 'http://localhost:8080/api/export';
+  private exportUrl = 'http://localhost:8080/api/exportPostings';
 
   constructor(private http: HttpClient) {}
 
-  exportPosting(transactionId: string): Observable<Blob> {
-    return this.http.get(`${this.baseUrl}/postings/${transactionId}`, { responseType: 'blob' });
-  }
+  exportPostingsToExcel(): Observable<Blob> {
+    const headers = new HttpHeaders({
+      'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    });
 
-  exportMouvement(transactionId: string): Observable<Blob> {
-    return this.http.get(`${this.baseUrl}/mouvements/${transactionId}`, { responseType: 'blob' });
-  }
-
-  exportCre(transactionId: string): Observable<Blob> {
-    return this.http.get(`${this.baseUrl}/cres/${transactionId}`, { responseType: 'blob' });
-  }
-
-  exportAll(transactionId: string): Observable<Blob> {
-    return this.http.get(`${this.baseUrl}/all/${transactionId}`, { responseType: 'blob' });
+    return this.http.get(this.exportUrl, { headers: headers, responseType: 'blob' });
   }
 }

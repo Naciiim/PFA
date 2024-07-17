@@ -5,14 +5,19 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import {HomepageFrontComponent} from "./homepage-front/homepage-front.component";
 import {FormsModule} from "@angular/forms";
-import { InvalidPostingsListComponent } from './invalid-postings-list/invalid-postings-list.component';
+import { DefaultPostingsComponent } from './default-postings/default-postings-component';
+import {TransactionPostingsComponent} from "./transaction-postings/transaction-postings-component";
+import {ExportService} from "./services/export.service";
+import {PostingService} from "./services/posting.service";
+
 
 
 @NgModule({
   declarations: [
     AppComponent,
     HomepageFrontComponent,
-    InvalidPostingsListComponent,
+    DefaultPostingsComponent,
+    TransactionPostingsComponent,
   ],
     imports: [
         BrowserModule,
@@ -20,7 +25,7 @@ import { InvalidPostingsListComponent } from './invalid-postings-list/invalid-po
         FormsModule,
        HttpClientModule
     ],
-  providers: [],
+  providers: [PostingService, ExportService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

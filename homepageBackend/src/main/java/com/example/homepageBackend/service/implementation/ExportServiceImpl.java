@@ -3,6 +3,7 @@ package com.example.homepageBackend.service.implementation;
 import com.example.homepageBackend.model.dto.PostingDTO;
 import com.example.homepageBackend.service.interfaces.ExportService;
 import com.example.homepageBackend.util.DatabaseUtils;
+import com.example.homepageBackend.util.Utils;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -21,11 +22,19 @@ public class ExportServiceImpl implements ExportService {
 
     @Override
     public void exportToExcel(List<PostingDTO> postings, OutputStream outputStream) throws IOException {
+        if (postings == null || postings.isEmpty()) {
+            throw new IllegalArgumentException("La liste des postings est null ou vide");
+        }
+
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Postings");
 
             // Récupérer les noms de colonnes depuis la base de données à l'aide de la classe utilitaire
             List<String> columnNames = DatabaseUtils.getDatabaseColumnNames("POSTING");
+
+            if (columnNames == null || columnNames.isEmpty()) {
+                throw new IllegalStateException("La liste des noms de colonnes est null ou vide");
+            }
 
             // Créer la ligne d'en-tête dynamiquement
             Row headerRow = sheet.createRow(0);
@@ -37,10 +46,13 @@ public class ExportServiceImpl implements ExportService {
             // Créer les lignes de données
             int rowIdx = 1;
             for (PostingDTO posting : postings) {
+                if (posting == null) {
+                    continue; // Ignorer les éléments null dans postings
+                }
                 Row row = sheet.createRow(rowIdx++);
                 for (int i = 0; i < columnNames.size(); i++) {
                     String columnName = columnNames.get(i);
-                    Method getter = findGetterMethod(posting, convertColumnNameToFieldName(columnName));
+                    Method getter = Utils.findGetterMethod(posting, Utils.convertColumnNameToFieldName(columnName));
 
                     if (getter != null) {
                         try {
@@ -72,38 +84,6 @@ public class ExportServiceImpl implements ExportService {
             e.printStackTrace();
             throw e; // Propager l'exception si elle se produit lors de l'écriture dans le flux de sortie
         }
-    }
-
-    // Méthode pour trouver la méthode getter correspondante pour une propriété donnée
-    private Method findGetterMethod(Object object, String fieldName) {
-        String getterMethodName = "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
-        Method[] methods = object.getClass().getMethods();
-        for (Method method : methods) {
-            if (method.getName().equals(getterMethodName)) {
-                return method;
-            }
-        }
-        return null;
-    }
-
-    // Convertit le nom de colonne en nom de champ Java
-    private String convertColumnNameToFieldName(String columnName) {
-        StringBuilder fieldNameBuilder = new StringBuilder();
-        boolean nextUpperCase = false;
-        for (int i = 0; i < columnName.length(); i++) {
-            char c = columnName.charAt(i);
-            if (c == '_') {
-                nextUpperCase = true;
-            } else {
-                if (nextUpperCase) {
-                    fieldNameBuilder.append(Character.toUpperCase(c));
-                    nextUpperCase = false;
-                } else {
-                    fieldNameBuilder.append(Character.toLowerCase(c));
-                }
-            }
-        }
-        return fieldNameBuilder.toString();
     }
 
 }

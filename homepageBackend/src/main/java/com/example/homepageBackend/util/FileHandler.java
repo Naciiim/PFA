@@ -3,6 +3,8 @@ package com.example.homepageBackend.util;
 import com.example.homepageBackend.model.dto.PostingDTO;
 
 import com.example.homepageBackend.model.entity.Posting;
+import com.example.homepageBackend.repository.PostingRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -10,6 +12,9 @@ import java.util.stream.Collectors;
 
 @Component
 public class FileHandler {
+    @Autowired
+    private PostingRepository postingRepository;
+
 
     // Vérification si etat == 'T'
     public boolean isEtatT(String etat) {
@@ -24,12 +29,20 @@ public class FileHandler {
     }
 
 
-
-
-
     // Valider transactionId et masterReference
     public boolean validateTransactionIdAndMasterReference(String transactionId, String masterReference) {
         return (transactionId == null || transactionId.isEmpty()) && (masterReference == null || masterReference.isEmpty());
     }
 
+    // Vérifier si transactionId et masterReference appartiennent au même posting
+    public boolean areSamePosting(String transactionId, String masterReference) {
+        if (transactionId != null && !transactionId.isEmpty() && masterReference != null && !masterReference.isEmpty()) {
+            Posting postingByTransactionId = postingRepository.findById_Transactionid(transactionId).stream().findFirst().orElse(null);
+            Posting postingByMasterReference = postingRepository.findByMasterreference(masterReference).stream().findFirst().orElse(null);
+
+            return postingByTransactionId != null && postingByMasterReference != null &&
+                    postingByTransactionId.getId().equals(postingByMasterReference.getId());
+        }
+        return false;
+    }
 }

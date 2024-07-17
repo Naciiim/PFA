@@ -1,0 +1,40 @@
+<div *ngIf="postings.length > 0" class="mt-4">
+  <h2 class="text-lg font-bold mb-2 text-center">Transaction Postings</h2>
+  <div class="shadow-lg rounded-lg overflow-hidden mx-4 md:mx-10">
+    <button (click)="exportToExcel()" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 ">
+      Export
+    </button>
+    <table class="w-full table-fixed">
+      <thead>
+      <tr class="bg-gray-100">
+        <th class="w-1/6 py-4 px-6 text-center text-gray-600 font-bold uppercase">Transaction ID</th>
+        <th class="w-1/6 py-4 px-6 text-center text-gray-600 font-bold uppercase">Transaction Seq No</th>
+        <th class="w-1/4 py-4 px-6 text-center text-gray-600 font-bold uppercase">Account Number</th>
+        <th class="w-1/6 py-4 px-6 text-center text-gray-600 font-bold uppercase">Account Type</th>
+        <th class="w-1/6 py-4 px-6 text-center text-gray-600 font-bold uppercase">Debit/Credit Flag</th>
+        <th class="w-1/6 py-4 px-6 text-center text-gray-600 font-bold uppercase">Posting Currency</th>
+        <th class="w-1/6 py-4 px-6 text-center text-gray-600 font-bold uppercase">Posting Amount</th>
+        <th class="w-1/6 py-4 px-6 text-center text-gray-600 font-bold uppercase">Etat</th>
+      </tr>
+      </thead>
+      <tbody class="bg-white">
+      <tr *ngFor="let posting of postings" class="border-b border-gray-200">
+        <td class="py-4 px-6 text-center">{{ posting.transactionid }}</td>
+        <td class="py-4 px-6 text-center">{{ posting.transactionseqno }}</td>
+        <td class="py-4 px-4 text-center">{{ posting.accountnumber }}</td>
+        <td class="py-4 px-8 text-center">{{ posting.accounttype }}</td>
+        <td class="py-4 px-6 text-center">{{ posting.debitcreditflag }}</td>
+        <td class="py-4 px-6 text-center">{{ posting.postingccy }}</td>
+        <td class="py-4 px-6 text-center">{{ posting.postingamount }}</td>
+        <td class="py-4 px-6 text-center">
+            <span [ngClass]="{
+              'text-green-500': posting.etat === 'T',
+              'text-red-500': posting.etat === 'M',
+              'text-yellow-500': posting.etat === 'N'
+            }">{{ posting.etat }}</span>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

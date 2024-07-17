@@ -24,7 +24,7 @@ public class HomePageServiceImpl implements HomePageService {
     @Autowired
     private FileHandler fileHandler;
 
- @Override
+    @Override
     public Map<String, Object> validateAndRetrieveData(PostingDTO posting) {
         Map<String, Object> response = new LinkedHashMap<>();
 
@@ -33,7 +33,8 @@ public class HomePageServiceImpl implements HomePageService {
 
         // Utiliser FileHandler pour valider transactionId et masterReference
         if (fileHandler.validateTransactionIdAndMasterReference(posting.getTransactionid(), posting.getMasterreference())) {
-            response.put("postingsWithDifferentEtat", postingsWithDifferentEtat);
+            response.put("POSTINGSEARCHED", postingsWithDifferentEtat);
+            response.put("postingWithDiffEtat", postingsWithDifferentEtat);
             return response;
         }
 
@@ -41,38 +42,28 @@ public class HomePageServiceImpl implements HomePageService {
         logger.info("MasterReference: {}", posting.getMasterreference());
 
         // Initialiser les listes de postings
-        List<PostingDTO> postingsWithTEtat = null;
+        List<PostingDTO> postingsSearched = null;
 
         // Récupérer les postings par transactionId si fourni
         if (posting.getTransactionid() != null && !posting.getTransactionid().isEmpty()) {
             logger.info("Récupération des postings par transactionId: {}", posting.getTransactionid());
             List<PostingDTO> postingsDTO = postingServiceImpl.getPostingsByTransactionId(posting.getTransactionid());
 
-            // Utiliser FileHandler pour séparer les postings ayant un état 'T' et les autres
-            postingsWithTEtat = postingsDTO.stream()
+            // Filtrer les postings avec état différent de 'T' pour le même transactionId
+            List<PostingDTO> postingsWithTEtat = postingsDTO.stream()
                     .filter(p -> fileHandler.isEtatT(p.getEtat()))
                     .collect(Collectors.toList());
 
-            // Utiliser FileHandler pour filtrer les postings ayant un état différent de 'T' pour le même transactionId
-            List<PostingDTO> postingsWithDifferentEtatForSameTransactionId = postingsDTO.stream()
-                    .filter(p -> !fileHandler.isEtatT(p.getEtat()))
+            postingsSearched = postingsDTO.stream()
+                    .filter(p -> p.getTransactionid().equals(posting.getTransactionid()))
                     .collect(Collectors.toList());
-
-            // Ajouter les postings avec un état différent de 'T' pour le même transactionId à postingsWithDifferentEtat
-//            postingsWithDifferentEtat.addAll(postingsWithDifferentEtatForSameTransactionId);
         }
 
-        // Si aucun posting n'a été trouvé pour le transactionId donné, retourner les postings avec état différent de 'T'
-        if (postingsWithTEtat == null) {
-            response.put("postingsWithDifferentEtat", postingsWithDifferentEtat);
-            return response;
-        }
-
-        // Ajouter les postings avec état 'T' du transactionId dans la réponse
-        response.put("postingsWithTEtat", postingsWithTEtat);
+        // Ajouter les postings avec le même transactionId dans la réponse
+        response.put("POSTINGSEARCHED", postingsSearched);
 
         // Ajouter les postings avec état différent de 'T' dans la réponse
-        response.put("postingsWithDifferentEtat", postingsWithDifferentEtat);
+        response.put("postingWithDiffEtat", postingsWithDifferentEtat);
 
         // Ajouter un message si des postings ont un état différent de 'T'
         if (!postingsWithDifferentEtat.isEmpty()) {
