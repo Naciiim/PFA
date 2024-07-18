@@ -8,8 +8,8 @@ import java.util.List;
 public interface PostingService {
   List<PostingDTO> getPostingsByTransactionId(String transactionId);
  List<PostingDTO> getPostingsByMasterreference(String masterReference);
+ List<PostingDTO> getPostingsByTransactionIdAndMasterReference(String transactionid, String masterreference);
 
-List<PostingDTO> getInvalidPostings(List<Posting> postings);
  List<PostingDTO> getPostingsWithDifferentEtat() ;
 
 

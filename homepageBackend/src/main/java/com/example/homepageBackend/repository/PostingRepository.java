@@ -10,6 +10,7 @@ import java.util.List;
 @Repository
 public interface PostingRepository extends JpaRepository<Posting, PostingPK> {
   List<Posting> findById_Transactionid(String transactionid);
-  List<Posting> findByMasterreference(String masterReference);
+  List<Posting> findByMasterreference(String masterreference);
   List<Posting> findByEtatNot(String etat);
+  List<Posting> findById_TransactionidAndMasterreference(String transactionid, String masterreference);
 }

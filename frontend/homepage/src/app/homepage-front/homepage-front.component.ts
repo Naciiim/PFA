@@ -10,6 +10,7 @@ import { Posting } from '../models/posting.model';
 })
 export class HomepageFrontComponent implements OnInit {
   transactionid: string = '';
+  masterreference: string = '';
   defaultPostings: Posting[] = [];
   transactionPostings: Posting[] = [];
   errorMessage: string = '';
@@ -21,7 +22,7 @@ export class HomepageFrontComponent implements OnInit {
   }
 
   loadDefaultPostings() {
-    const defaultRequest = { transactionid: '', ref: '', event: '' };
+    const defaultRequest = { transactionid: '', masterreference: '', eventreference: '' };
     this.postingService.getPostings(defaultRequest).subscribe(
       response => {
         console.log('Réponse du serveur pour les postings par défaut :', response);
@@ -39,31 +40,28 @@ export class HomepageFrontComponent implements OnInit {
   }
 
   searchPostings() {
-    if (!this.transactionid) {
-      this.errorMessage = 'L\'ID de transaction est requis';
+    if (!this.transactionid && !this.masterreference) {
+      this.errorMessage = 'L\'ID de transaction ou la référence maître est requise';
       return;
     }
 
-    const searchRequest = { transactionid: this.transactionid, ref: '', event: '' };
+    const searchRequest = {
+      transactionid: this.transactionid,
+      masterreference: this.masterreference,
+      eventreference: ''
+    };
+
     this.postingService.getPostings(searchRequest).subscribe(
       response => {
-        console.log('Réponse du serveur pour les postings de la transaction :', response);
+        console.log('Réponse du serveur pour les postings recherchés :', response);
         if (response) {
-          // Filtrer les postings par transactionid
-          const filteredPostingsWithTEtat = (response.POSTINGSEARCHED || []).filter((posting: Posting) => posting.transactionid === this.transactionid);
-          const filteredPostingsWithDifferentEtat = (response.postingWithDiffEtat || []).filter((posting: Posting) => posting.transactionid === this.transactionid);
+          this.transactionPostings = response.POSTINGSEARCHED || [];
 
-          const allPostings = [...filteredPostingsWithTEtat, ...filteredPostingsWithDifferentEtat];
-
-          if (allPostings.length > 0) {
-            this.transactionPostings = allPostings;
+          if (this.transactionPostings.length > 0) {
             this.errorMessage = '';
           } else {
-            this.transactionPostings = [];
-            this.errorMessage = 'Aucun posting trouvé pour l\'ID de transaction donné';
+            this.errorMessage = 'Aucun posting trouvé pour les critères spécifiés';
           }
-
-          console.log('Tous les postings pour transactionId:', this.transactionid, allPostings);
 
           if (response.message) {
             console.warn(response.message);
@@ -80,6 +78,7 @@ export class HomepageFrontComponent implements OnInit {
   dismissError() {
     this.errorMessage = '';
     this.transactionid = '';
+    this.masterreference = '';
     this.loadDefaultPostings();
     this.router.navigate(['/']);
   }

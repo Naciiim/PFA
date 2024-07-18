@@ -30,22 +30,17 @@ public class PostingServiceImpl implements PostingService {
     }
 
     @Override
-    public List<PostingDTO> getPostingsByMasterreference(String masterReference) {
-        return postingRepository.findByMasterreference(masterReference).stream()
+    public List<PostingDTO> getPostingsByMasterreference(String masterreference) {
+        return postingRepository.findByMasterreference(masterreference).stream()
                 .map(postingMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<PostingDTO> getInvalidPostings(List<Posting> postings) {
-        // Filtrer les postings invalides en utilisant FileHandler
-        List<Posting> invalidPostings = fileHandler.filterInvalidPostings(postings);
-
-        List<PostingDTO> postingDTOs = invalidPostings.stream()
+    public List<PostingDTO> getPostingsByTransactionIdAndMasterReference(String transactionid, String masterreference) {
+        return postingRepository.findById_TransactionidAndMasterreference(transactionid, masterreference).stream()
                 .map(postingMapper::toDto)
                 .collect(Collectors.toList());
-
-        return postingDTOs;
     }
     @Override
     public List<PostingDTO> getPostingsWithDifferentEtat() {

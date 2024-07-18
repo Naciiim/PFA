@@ -1,7 +1,9 @@
 <div *ngIf="postings.length > 0" class="mt-4">
   <h2 class="text-lg font-bold mb-2 text-center">Transaction Postings</h2>
   <div class="shadow-lg rounded-lg overflow-hidden mx-4 md:mx-10">
-    <button (click)="exportToExcel()" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 ">
+
+    <div>
+      <button (click)="exportToExcel()" class=" float-right bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 ">
       Export
     </button>
     <table class="w-full table-fixed">
