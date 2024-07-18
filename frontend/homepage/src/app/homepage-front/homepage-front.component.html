@@ -41,5 +41,5 @@
 <!-- Affichage des postings par défaut -->
 <app-default-postings *ngIf="!(transactionid && transactionid.length > 0) && defaultPostings.length > 0 && transactionPostings.length === 0" [postings]="defaultPostings"></app-default-postings>
 
-<!-- Affichage des postings de la transaction -->
+<!-- Affichage des postings recherchés -->
 <app-transaction-postings *ngIf="transactionPostings.length > 0" [postings]="transactionPostings"></app-transaction-postings>

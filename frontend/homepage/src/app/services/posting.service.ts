@@ -12,7 +12,7 @@ export class PostingService {
   constructor(private http: HttpClient) { }
 
   getPostings(requestData: any): Observable<any> {
-    const url = `${this.baseUrl}/getPosting`; // Assurez-vous que l'URL correspond à votre endpoint backend
+    const url = `${this.baseUrl}/getPosting`;
     return this.http.post(url, requestData);
   }
 }
