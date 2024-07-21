@@ -5,6 +5,7 @@ import com.example.homepageBackend.util.FileHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashMap;
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 
 
 @Service
+@Profile(value = {"DEV","PROD","REC"})
 public class HomePageServiceImpl implements HomePageService {
 
     private static final Logger logger = LoggerFactory.getLogger(HomePageServiceImpl.class);
