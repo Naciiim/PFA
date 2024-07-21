@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { PostingService } from '../services/posting.service';
 import { Router } from "@angular/router";
+
 import { Posting } from '../models/posting.model';
 
 @Component({
@@ -11,6 +12,7 @@ import { Posting } from '../models/posting.model';
 export class HomepageFrontComponent implements OnInit {
   transactionid: string = '';
   masterreference: string = '';
+  eventreference: string = '';
   defaultPostings: Posting[] = [];
   transactionPostings: Posting[] = [];
   errorMessage: string = '';
@@ -48,7 +50,7 @@ export class HomepageFrontComponent implements OnInit {
     const searchRequest = {
       transactionid: this.transactionid,
       masterreference: this.masterreference,
-      eventreference: ''
+      eventreference: this.eventreference
     };
 
     this.postingService.getPostings(searchRequest).subscribe(
@@ -79,6 +81,7 @@ export class HomepageFrontComponent implements OnInit {
     this.errorMessage = '';
     this.transactionid = '';
     this.masterreference = '';
+    this.eventreference='';
     this.loadDefaultPostings();
     this.router.navigate(['/']);
   }

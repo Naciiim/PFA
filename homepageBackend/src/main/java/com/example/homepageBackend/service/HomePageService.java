@@ -1,4 +1,4 @@
-package com.example.homepageBackend.service.interfaces;
+package com.example.homepageBackend.service;
 
 import com.example.homepageBackend.model.dto.PostingDTO;
 

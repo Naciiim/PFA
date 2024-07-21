@@ -13,4 +13,7 @@ public interface PostingRepository extends JpaRepository<Posting, PostingPK> {
   List<Posting> findByMasterreference(String masterreference);
   List<Posting> findByEtatNot(String etat);
   List<Posting> findById_TransactionidAndMasterreference(String transactionid, String masterreference);
+  List<Posting> findById_TransactionidAndEventreference(String transactionid, String eventreference);
+  List<Posting> findByMasterreferenceAndEventreference(String masterreference, String eventreference);
+  List<Posting> findById_TransactionidAndMasterreferenceAndEventreference(String transactionid, String masterreference, String eventreference);
 }

@@ -1,15 +1,12 @@
-package com.example.homepageBackend.service.implementation;
+package com.example.homepageBackend.service;
 
 import com.example.homepageBackend.model.dto.PostingDTO;
 import com.example.homepageBackend.model.entity.Posting;
 import com.example.homepageBackend.model.mapper.PostingMapper;
 import com.example.homepageBackend.repository.PostingRepository;
-import com.example.homepageBackend.service.interfaces.PostingService;
-import com.example.homepageBackend.util.FileHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,8 +16,7 @@ public class PostingServiceImpl implements PostingService {
     private PostingRepository postingRepository;
     @Autowired
     private PostingMapper postingMapper;
-    @Autowired
-    private FileHandler fileHandler;
+
 
     @Override
     public List<PostingDTO> getPostingsByTransactionId(String transactionid) {
@@ -42,6 +38,28 @@ public class PostingServiceImpl implements PostingService {
                 .map(postingMapper::toDto)
                 .collect(Collectors.toList());
     }
+    @Override
+    public List<PostingDTO> getPostingsByTransactionidAndEventreference(String transactionid, String eventreference) {
+        return postingRepository.findById_TransactionidAndEventreference(transactionid, eventreference).stream()
+                .map(postingMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<PostingDTO> getPostingsByMasterreferenceAndEventreference(String masterreference, String eventreference) {
+        return postingRepository.findByMasterreferenceAndEventreference(masterreference, eventreference)
+                .stream()
+                .map(postingMapper::toDto)
+                .collect(Collectors.toList());
+    }
+    @Override
+    public List<PostingDTO> getPostingsByTransactionidAndMasterreferenceAndEventreference(String transactionid, String masterreference, String eventreference)
+    {
+        return postingRepository.findById_TransactionidAndMasterreferenceAndEventreference(transactionid, masterreference, eventreference).stream()
+                .map(postingMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
     @Override
     public List<PostingDTO> getPostingsWithDifferentEtat() {
         List<Posting> postings = postingRepository.findByEtatNot("T");

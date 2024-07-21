@@ -1,6 +1,8 @@
 import { Component, Input } from '@angular/core';
 import { Posting } from '../models/posting.model';
 import { ExportService } from '../services/export.service';
+import {PostingDetailsComponent} from "../posting-details/posting-details.component";
+import {MatDialog} from "@angular/material/dialog";
 
 @Component({
   selector: 'app-transaction-postings',
@@ -10,7 +12,9 @@ import { ExportService } from '../services/export.service';
 export class TransactionPostingsComponent {
   @Input() postings: Posting[] = [];
 
-  constructor(private exportService: ExportService) {}
+  constructor(private exportService: ExportService,
+              private dialog: MatDialog) {}
+
 
   exportToExcel() {
     this.exportService.exportPostingsToExcel().subscribe(
@@ -28,5 +32,10 @@ export class TransactionPostingsComponent {
         alert('Une erreur s\'est produite lors de l\'exportation des données. Veuillez réessayer.');
       }
     );
+  }
+  openDialog(posting: Posting): void {
+    this.dialog.open(PostingDetailsComponent, {
+      data: posting
+    });
   }
 }

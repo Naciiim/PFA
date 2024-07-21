@@ -32,6 +32,14 @@ public class FileHandler {
     public boolean validateTransactionIdAndMasterReference(String transactionId, String masterReference) {
         return (transactionId == null || transactionId.isEmpty()) && (masterReference == null || masterReference.isEmpty());
     }
+    // Valider transactionId et eventReference
+    public boolean validateTransactionIdAndEventReference(String transactionId, String eventReference) {
+        return (transactionId == null || transactionId.isEmpty()) && (eventReference == null || eventReference.isEmpty());
+    }
 
+    // Valider masterReference et eventReference
+    public boolean validateMasterReferenceAndEventReference(String masterReference, String eventReference) {
+        return (masterReference == null || masterReference.isEmpty()) && (eventReference == null || eventReference.isEmpty());
+    }
 
 }

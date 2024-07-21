@@ -1,7 +1,6 @@
-package com.example.homepageBackend.service.implementation;
+package com.example.homepageBackend.service;
 
 import com.example.homepageBackend.model.dto.PostingDTO;
-import com.example.homepageBackend.service.interfaces.ExportService;
 import com.example.homepageBackend.util.DatabaseUtils;
 import com.example.homepageBackend.util.Utils;
 import org.apache.poi.ss.usermodel.*;
@@ -27,7 +26,7 @@ public class ExportServiceImpl implements ExportService {
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Postings");
 
-            // Récupérer les noms de colonnes depuis la base de données à l'aide de la classe utilitaire
+            // Récupérer les noms de colonnes depuis le premier objet PostingDTO
             List<String> columnNames = DatabaseUtils.getDatabaseColumnNames("POSTING");
 
             if (columnNames == null || columnNames.isEmpty()) {
@@ -36,15 +35,22 @@ public class ExportServiceImpl implements ExportService {
 
             // Créer la ligne d'en-tête dynamiquement
             Row headerRow = sheet.createRow(0);
+            CellStyle headerCellStyle = workbook.createCellStyle();
+            Font headerFont = workbook.createFont();
+            headerFont.setBold(true);
+            headerCellStyle.setFont(headerFont);
+
             for (int i = 0; i < columnNames.size(); i++) {
                 String columnName = columnNames.get(i);
-                headerRow.createCell(i).setCellValue(columnName);
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(columnName);
+                cell.setCellStyle(headerCellStyle);
             }
 
             // Créer les styles pour les dates
             CellStyle dateCellStyle = workbook.createCellStyle();
             CreationHelper createHelper = workbook.getCreationHelper();
-            dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd/MM/yyyy"));
+            dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("yyyy-MM-dd"));
 
             // Créer les lignes de données
             int rowIdx = 1;
@@ -60,8 +66,8 @@ public class ExportServiceImpl implements ExportService {
                     if (getter != null) {
                         try {
                             Object value = getter.invoke(posting);
+                            Cell cell = row.createCell(i);
                             if (value != null) {
-                                Cell cell = row.createCell(i);
                                 if (value instanceof Date) {
                                     cell.setCellValue((Date) value);
                                     cell.setCellStyle(dateCellStyle);
@@ -71,7 +77,7 @@ public class ExportServiceImpl implements ExportService {
                                     cell.setCellValue(value.toString());
                                 }
                             } else {
-                                row.createCell(i).setCellValue("");
+                                cell.setCellValue("");
                             }
                         } catch (IllegalAccessException | InvocationTargetException e) {
                             e.printStackTrace();
@@ -96,5 +102,4 @@ public class ExportServiceImpl implements ExportService {
             throw e; // Propager l'exception si elle se produit lors de l'écriture dans le flux de sortie
         }
     }
-
 }
