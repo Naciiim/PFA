@@ -1,11 +1,15 @@
 package com.example.homepageBackend.service;
 
 import com.example.homepageBackend.model.dto.PostingDTO;
+import com.example.homepageBackend.model.dto.PostingRequestDTO;
 import com.example.homepageBackend.util.FileHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashMap;
@@ -15,7 +19,7 @@ import java.util.stream.Collectors;
 
 
 @Service
-@Profile(value = {"DEV","PROD","REC"})
+@Profile(value = {"DEV", "PROD", "REC"})
 public class HomePageServiceImpl implements HomePageService {
 
     private static final Logger logger = LoggerFactory.getLogger(HomePageServiceImpl.class);
@@ -27,85 +31,75 @@ public class HomePageServiceImpl implements HomePageService {
     private FileHandler fileHandler; // Injection de FileHandler
 
     @Override
-    public Map<String, Object> validateAndRetrieveData(PostingDTO posting) {
+    public Map<String, Object> validateAndRetrieveData(PostingRequestDTO postingRequest) {
         Map<String, Object> response = new LinkedHashMap<>();
+        Pageable pageable = PageRequest.of(postingRequest.getPage(), postingRequest.getSize());
 
         // Récupérer tous les postings ayant un état différent de 'T'
-        List<PostingDTO> postingsWithDifferentEtat = postingService.getPostingsWithDifferentEtat();
-        // Ajouter les postings avec état différent de 'T' dans la réponse
-        response.put("postingWithDiffEtat", postingsWithDifferentEtat);
+        Page<PostingDTO> postingsWithDifferentEtat = postingService.getPostingsWithDifferentEtat(pageable);
+        List<PostingDTO> postingsListWithDifferentEtat = postingsWithDifferentEtat.getContent();
+        response.put("postingWithDiffEtat", postingsListWithDifferentEtat);
+        response.put("totalPagesWithDiffEtat", postingsWithDifferentEtat.getTotalPages());
+        response.put("totalElementsWithDiffEtat", postingsWithDifferentEtat.getTotalElements());
 
-        // Vérifier transactionId et masterReference à l'aide de FileHandler
-        if (fileHandler.validateTransactionIdAndMasterReference(posting.getTransactionid(), posting.getMasterreference())) {
+        // Validation de transactionId et masterReference
+        if (fileHandler.validateTransactionIdAndMasterReference(postingRequest.getTransactionid(), postingRequest.getMasterreference())) {
             logger.warn("Validation échouée pour transactionId: {} et masterreference: {}",
-                    posting.getTransactionid(), posting.getMasterreference());
+                    postingRequest.getTransactionid(), postingRequest.getMasterreference());
             response.put("message", "Transaction ID et Master Reference ne peuvent pas être tous les deux vides.");
             return response;
         }
 
-// Vérifier et récupérer les postings selon transactionid et/ou masterreference
-        if (posting.getTransactionid() != null && !posting.getTransactionid().isEmpty() &&
-                (posting.getMasterreference() == null || posting.getMasterreference().isEmpty()) &&
-                (posting.getEventreference() == null || posting.getEventreference().isEmpty())) {
-            // Recherche par transactionid uniquement
-            logger.info("Récupération des postings par transactionId: {}", posting.getTransactionid());
-            List<PostingDTO> postingsByTransactionId = postingService.getPostingsByTransactionId(posting.getTransactionid());
-            response.put("POSTINGSEARCHED", postingsByTransactionId);
-        } else if (posting.getMasterreference() != null && !posting.getMasterreference().isEmpty() &&
-                (posting.getTransactionid() == null || posting.getTransactionid().isEmpty()) &&
-                (posting.getEventreference() == null || posting.getEventreference().isEmpty())) {
-            // Recherche par masterreference uniquement
-            logger.info("Récupération des postings par masterreference: {}", posting.getMasterreference());
-            List<PostingDTO> postingsByMasterReference = postingService.getPostingsByMasterreference(posting.getMasterreference());
-            response.put("POSTINGSEARCHED", postingsByMasterReference);
-        } else if (posting.getTransactionid() != null && !posting.getTransactionid().isEmpty() &&
-                posting.getMasterreference() != null && !posting.getMasterreference().isEmpty() &&
-                (posting.getEventreference() == null || posting.getEventreference().isEmpty())) {
-            // Recherche par transactionid et masterreference
+        // Récupération des postings selon les critères
+        Page<PostingDTO> postingsPage;
+        if (postingRequest.getTransactionid() != null && !postingRequest.getTransactionid().isEmpty() &&
+                (postingRequest.getMasterreference() == null || postingRequest.getMasterreference().isEmpty()) &&
+                (postingRequest.getEventreference() == null || postingRequest.getEventreference().isEmpty())) {
+            logger.info("Récupération des postings par transactionId: {}", postingRequest.getTransactionid());
+            postingsPage = postingService.getPostingsByTransactionId(postingRequest.getTransactionid(), pageable);
+        } else if (postingRequest.getMasterreference() != null && !postingRequest.getMasterreference().isEmpty() &&
+                (postingRequest.getTransactionid() == null || postingRequest.getTransactionid().isEmpty()) &&
+                (postingRequest.getEventreference() == null || postingRequest.getEventreference().isEmpty())) {
+            logger.info("Récupération des postings par masterreference: {}", postingRequest.getMasterreference());
+            postingsPage = postingService.getPostingsByMasterreference(postingRequest.getMasterreference(), pageable);
+        } else if (postingRequest.getTransactionid() != null && !postingRequest.getTransactionid().isEmpty() &&
+                postingRequest.getMasterreference() != null && !postingRequest.getMasterreference().isEmpty() &&
+                (postingRequest.getEventreference() == null || postingRequest.getEventreference().isEmpty())) {
             logger.info("Récupération des postings par transactionId: {} et masterreference: {}",
-                    posting.getTransactionid(), posting.getMasterreference());
-            List<PostingDTO> postingsByTransactionIdAndMasterReference = postingService.getPostingsByTransactionIdAndMasterReference(
-                    posting.getTransactionid(), posting.getMasterreference());
-            response.put("POSTINGSEARCHED", postingsByTransactionIdAndMasterReference);
-        } else if (posting.getTransactionid() != null && !posting.getTransactionid().isEmpty() &&
-                posting.getEventreference() != null && !posting.getEventreference().isEmpty() &&
-                (posting.getMasterreference() == null || posting.getMasterreference().isEmpty())) {
-            // Recherche par transactionid et eventreference
+                    postingRequest.getTransactionid(), postingRequest.getMasterreference());
+            postingsPage = postingService.getPostingsByTransactionIdAndMasterReference(postingRequest.getTransactionid(), postingRequest.getMasterreference(), pageable);
+        } else if (postingRequest.getTransactionid() != null && !postingRequest.getTransactionid().isEmpty() &&
+                postingRequest.getEventreference() != null && !postingRequest.getEventreference().isEmpty() &&
+                (postingRequest.getMasterreference() == null || postingRequest.getMasterreference().isEmpty())) {
             logger.info("Récupération des postings par transactionId: {} et eventreference: {}",
-                    posting.getTransactionid(), posting.getEventreference());
-            List<PostingDTO> postingsByTransactionidAndEventreference = postingService.getPostingsByTransactionidAndEventreference(
-                    posting.getTransactionid(), posting.getEventreference());
-            response.put("POSTINGSEARCHED", postingsByTransactionidAndEventreference);
-        } else if (posting.getMasterreference() != null && !posting.getMasterreference().isEmpty() &&
-                posting.getEventreference() != null && !posting.getEventreference().isEmpty() &&
-                (posting.getTransactionid() == null || posting.getTransactionid().isEmpty())) {
-            // Recherche par masterreference et eventreference
+                    postingRequest.getTransactionid(), postingRequest.getEventreference());
+            postingsPage = postingService.getPostingsByTransactionidAndEventreference(postingRequest.getTransactionid(), postingRequest.getEventreference(), pageable);
+        } else if (postingRequest.getMasterreference() != null && !postingRequest.getMasterreference().isEmpty() &&
+                postingRequest.getEventreference() != null && !postingRequest.getEventreference().isEmpty() &&
+                (postingRequest.getTransactionid() == null || postingRequest.getTransactionid().isEmpty())) {
             logger.info("Récupération des postings par masterreference: {} et eventreference: {}",
-                    posting.getMasterreference(), posting.getEventreference());
-            List<PostingDTO> postingsByMasterreferenceAndEventreference = postingService.getPostingsByMasterreferenceAndEventreference(
-                    posting.getMasterreference(), posting.getEventreference());
-            response.put("POSTINGSEARCHED", postingsByMasterreferenceAndEventreference);
-        } else if (posting.getTransactionid() != null && !posting.getTransactionid().isEmpty() &&
-                posting.getMasterreference() != null && !posting.getMasterreference().isEmpty() &&
-                posting.getEventreference() != null && !posting.getEventreference().isEmpty()) {
-            // Recherche par transactionid, masterreference et eventreference
+                    postingRequest.getMasterreference(), postingRequest.getEventreference());
+            postingsPage = postingService.getPostingsByMasterreferenceAndEventreference(postingRequest.getMasterreference(), postingRequest.getEventreference(), pageable);
+        } else if (postingRequest.getTransactionid() != null && !postingRequest.getTransactionid().isEmpty() &&
+                postingRequest.getMasterreference() != null && !postingRequest.getMasterreference().isEmpty() &&
+                postingRequest.getEventreference() != null && !postingRequest.getEventreference().isEmpty()) {
             logger.info("Récupération des postings par transactionId: {}, masterreference: {} et eventreference: {}",
-                    posting.getTransactionid(), posting.getMasterreference(), posting.getEventreference());
-            List<PostingDTO> postingsByAllThree = postingService.getPostingsByTransactionidAndMasterreferenceAndEventreference(
-                    posting.getTransactionid(), posting.getMasterreference(), posting.getEventreference());
-            response.put("POSTINGSEARCHED", postingsByAllThree);
-        }  else {
-            // Aucun critère de recherche fourni
+                    postingRequest.getTransactionid(), postingRequest.getMasterreference(), postingRequest.getEventreference());
+            postingsPage = postingService.getPostingsByTransactionidAndMasterreferenceAndEventreference(postingRequest.getTransactionid(), postingRequest.getMasterreference(), postingRequest.getEventreference(), pageable);
+        } else {
             logger.warn("Aucun critère de recherche valide fourni.");
             response.put("message", "Veuillez fournir au moins un critère de recherche valide (transactionid ou masterreference).");
+            return response;
         }
 
-        // Filtrer les postings avec un état différent de 'T' à l'aide de FileHandler
-        List<PostingDTO> filteredPostings = postingsWithDifferentEtat.stream()
-                .filter(postings -> !fileHandler.isEtatT(posting.getEtat()))
+        response.put("POSTINGSEARCHED", postingsPage.getContent());
+        response.put("totalPages", postingsPage.getTotalPages());
+        response.put("totalElements", postingsPage.getTotalElements());
+
+        List<PostingDTO> filteredPostings = postingsWithDifferentEtat.getContent().stream()
+                .filter(posting -> !fileHandler.isEtatT(posting.getEtat()))
                 .collect(Collectors.toList());
 
-        // Ajouter un message si des postings ont un état différent de 'T'
         if (!filteredPostings.isEmpty()) {
             StringBuilder message = new StringBuilder();
             message.append("Des postings ont un état différent de 'T' pour les critères fournis.");
@@ -115,4 +109,5 @@ public class HomePageServiceImpl implements HomePageService {
 
         return response;
     }
+
 }

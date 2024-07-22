@@ -1,6 +1,7 @@
 package com.example.homepageBackend.controller;
 
 import com.example.homepageBackend.model.dto.PostingDTO;
+import com.example.homepageBackend.model.dto.PostingRequestDTO;
 import com.example.homepageBackend.service.ExportServiceImpl;
 import com.example.homepageBackend.service.HomePageServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -26,18 +28,22 @@ public class PostingController {
     private ExportServiceImpl exportServiceImpl;
 
     // Variable pour stocker les postings récupérés
-    private List<PostingDTO> cachedPostings;
+    private final List<PostingDTO> cachedPostings= new ArrayList<>();;
 
     @PostMapping("/getPosting")
-    public ResponseEntity<Map<String, Object>> getPostings(@RequestBody PostingDTO posting) {
-        System.out.println("Received DTO: " + posting);
-        Map<String, Object> response = homepageServiceImpl.validateAndRetrieveData(posting);
+    public ResponseEntity<Map<String, Object>> getPostings(@RequestBody PostingRequestDTO postingRequest) {
+        System.out.println("Received DTO: " + postingRequest);
+        Map<String, Object> response = homepageServiceImpl.validateAndRetrieveData(postingRequest);
 
-        // Stocker les postings récupérés dans la variable de classe
-        cachedPostings = (List<PostingDTO>) response.get("POSTINGSEARCHED");
+        // Accumuler tous les postings récupérés
+        List<PostingDTO> postings = (List<PostingDTO>) response.get("POSTINGSEARCHED");
+        System.out.println("Postings: " + postings);
+        cachedPostings.addAll(postings); // Ajouter les postings récupérés à la liste en cache
+
         System.out.println("Cached Postings: " + cachedPostings);
         return ResponseEntity.ok(response);
     }
+
 
     @GetMapping("/exportPostings")
     public void exportPostings(HttpServletResponse response) {

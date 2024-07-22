@@ -2,17 +2,20 @@ package com.example.homepageBackend.service;
 
 import com.example.homepageBackend.model.dto.PostingDTO;
 import com.example.homepageBackend.model.entity.Posting;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
+
 public interface PostingService {
-    List<PostingDTO> getPostingsByTransactionId(String transactionId);
-    List<PostingDTO> getPostingsByMasterreference(String masterReference);
-    List<PostingDTO> getPostingsByTransactionIdAndMasterReference(String transactionid, String masterreference);
-    List<PostingDTO> getPostingsByTransactionidAndEventreference(String transactionid, String eventreference);
-    List<PostingDTO> getPostingsByMasterreferenceAndEventreference(String masterreference, String eventreference);
-    List<PostingDTO> getPostingsByTransactionidAndMasterreferenceAndEventreference(String transactionid, String masterreference, String eventreference);
-    List<PostingDTO> getPostingsWithDifferentEtat() ;
+    Page<PostingDTO> getPostingsByTransactionId(String transactionId, Pageable pageable);
+    Page<PostingDTO> getPostingsByMasterreference(String masterReference, Pageable pageable);
+    Page<PostingDTO> getPostingsByTransactionIdAndMasterReference(String transactionid, String masterreference, Pageable pageable);
+    Page<PostingDTO> getPostingsByTransactionidAndEventreference(String transactionid, String eventreference, Pageable pageable);
+    Page<PostingDTO> getPostingsByMasterreferenceAndEventreference(String masterreference, String eventreference, Pageable pageable);
+    Page<PostingDTO> getPostingsByTransactionidAndMasterreferenceAndEventreference(String transactionid, String masterreference, String eventreference, Pageable pageable);
+   Page<PostingDTO> getPostingsWithDifferentEtat(Pageable pageable) ;
 
 
 }
