@@ -24,7 +24,7 @@ export class TransactionPostingsComponent {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'postings.xlsx';
+        a.download = 'PostingSearched.xlsx';
         a.click();
         window.URL.revokeObjectURL(url);
       },

@@ -1,18 +1,28 @@
 package com.example.homepageBackend.util;
 
 
+import com.example.homepageBackend.model.dto.PostingDTO;
 import com.example.homepageBackend.model.entity.Posting;
 import com.example.homepageBackend.repository.PostingRepository;
+import com.example.homepageBackend.service.ExportServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
 public class FileHandler {
     @Autowired
-    private PostingRepository postingRepository;
+    private final ExportServiceImpl exportServiceImpl;
+
+    public FileHandler(ExportServiceImpl exportServiceImpl) {
+        this.exportServiceImpl = exportServiceImpl;
+    }
 
 
     // Vérification si etat == 'T'
@@ -32,14 +42,6 @@ public class FileHandler {
     public boolean validateTransactionIdAndMasterReference(String transactionId, String masterReference) {
         return (transactionId == null || transactionId.isEmpty()) && (masterReference == null || masterReference.isEmpty());
     }
-    // Valider transactionId et eventReference
-    public boolean validateTransactionIdAndEventReference(String transactionId, String eventReference) {
-        return (transactionId == null || transactionId.isEmpty()) && (eventReference == null || eventReference.isEmpty());
-    }
 
-    // Valider masterReference et eventReference
-    public boolean validateMasterReferenceAndEventReference(String masterReference, String eventReference) {
-        return (masterReference == null || masterReference.isEmpty()) && (eventReference == null || eventReference.isEmpty());
-    }
 
 }

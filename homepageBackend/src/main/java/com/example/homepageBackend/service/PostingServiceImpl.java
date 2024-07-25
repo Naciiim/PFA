@@ -58,5 +58,22 @@ public class PostingServiceImpl implements PostingService {
         return postingRepository.findByEtatNot("T", pageable).map(postingMapper::toDto);
     }
 
+    @Override
+    public List<PostingDTO> getAllPostingsWithDifferentEtat() {
+        List<PostingDTO> allPostings = new ArrayList<>();
+        int pageNumber = 0;
+        int pageSize = 100; // Adjust page size as needed
+        Page<PostingDTO> page;
+
+        do {
+            Pageable pageable = PageRequest.of(pageNumber, pageSize);
+            page = postingRepository.findByEtatNot("T", pageable).map(postingMapper::toDto);
+            allPostings.addAll(page.getContent());
+            pageNumber++;
+        } while (page.hasNext());
+
+        return allPostings;
+    }
+
 }
 

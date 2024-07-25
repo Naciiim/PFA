@@ -18,6 +18,8 @@ public interface PostingService {
     Page<PostingDTO> getPostingsByTransactionidAndMasterreferenceAndEventreference(String transactionid, String masterreference, String eventreference, Pageable pageable);
    Page<PostingDTO> getPostingsWithDifferentEtat(Pageable pageable) ;
 
+  List<PostingDTO> getAllPostingsWithDifferentEtat() ;
 
 
-}
+
+    }

@@ -2,18 +2,27 @@ package com.example.homepageBackend.util;
 
 import com.example.homepageBackend.model.dto.PostingDTO;
 import com.example.homepageBackend.model.dto.PostingRequestDTO;
+import com.example.homepageBackend.service.ExportServiceImpl;
 import com.example.homepageBackend.service.HomePageServiceImpl;
 import com.example.homepageBackend.service.PostingServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
 public class Utils {
+
+    @Autowired
+    private ExportServiceImpl exportServiceImpl;
 
     public static Method findGetterMethod(Object object, String fieldName) {
         String getterMethodName = "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
@@ -98,9 +107,6 @@ public class Utils {
         System.out.println("Total pages: " + (pagedPostingsWithDiffEtat != null ? pagedPostingsWithDiffEtat.getTotalPages() : 0));
         System.out.println("Has more pages: " + (pagedPostingsWithDiffEtat != null ? pagedPostingsWithDiffEtat.hasNext() : false));
     }
-
-
-
 
 
 }
