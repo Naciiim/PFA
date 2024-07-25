@@ -10,7 +10,7 @@ export class ExportService {
 
   constructor(private http: HttpClient) {}
 
-  exportPostingsToExcel(): Observable<Blob> {
+  exportDataToExcel(): Observable<Blob> {
     const headers = new HttpHeaders({
       'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     });

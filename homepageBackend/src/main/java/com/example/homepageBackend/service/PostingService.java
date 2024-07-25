@@ -1,6 +1,7 @@
 package com.example.homepageBackend.service;
 
 import com.example.homepageBackend.model.dto.PostingDTO;
+import com.example.homepageBackend.model.dto.PostingRequestDTO;
 import com.example.homepageBackend.model.entity.Posting;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +17,7 @@ public interface PostingService {
     Page<PostingDTO> getPostingsByMasterreferenceAndEventreference(String masterreference, String eventreference, Pageable pageable);
     Page<PostingDTO> getPostingsByTransactionidAndMasterreferenceAndEventreference(String transactionid, String masterreference, String eventreference, Pageable pageable);
    Page<PostingDTO> getPostingsWithDifferentEtat(Pageable pageable) ;
+
 
 
 }

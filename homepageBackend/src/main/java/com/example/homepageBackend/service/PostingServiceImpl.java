@@ -1,14 +1,17 @@
 package com.example.homepageBackend.service;
 
 import com.example.homepageBackend.model.dto.PostingDTO;
+import com.example.homepageBackend.model.dto.PostingRequestDTO;
 import com.example.homepageBackend.model.entity.Posting;
 import com.example.homepageBackend.model.mapper.PostingMapper;
 import com.example.homepageBackend.repository.PostingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 @Service
@@ -54,5 +57,6 @@ public class PostingServiceImpl implements PostingService {
     public Page<PostingDTO> getPostingsWithDifferentEtat(Pageable pageable) {
         return postingRepository.findByEtatNot("T", pageable).map(postingMapper::toDto);
     }
+
 }
 

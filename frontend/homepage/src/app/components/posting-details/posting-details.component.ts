@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import { Posting } from '../models/posting.model';
+import {Posting} from "../../models/posting.model";
 
 @Component({
   selector: 'app-posting-details',

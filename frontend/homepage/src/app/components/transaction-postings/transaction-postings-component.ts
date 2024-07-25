@@ -1,8 +1,9 @@
 import { Component, Input } from '@angular/core';
-import { Posting } from '../models/posting.model';
-import { ExportService } from '../services/export.service';
+
+import { MatDialog } from '@angular/material/dialog';
 import {PostingDetailsComponent} from "../posting-details/posting-details.component";
-import {MatDialog} from "@angular/material/dialog";
+import {Posting} from "../../models/posting.model";
+import {ExportService} from "../../services/export.service";
 
 @Component({
   selector: 'app-transaction-postings',
@@ -12,12 +13,12 @@ import {MatDialog} from "@angular/material/dialog";
 export class TransactionPostingsComponent {
   @Input() postings: Posting[] = [];
 
-  constructor(private exportService: ExportService,
-              private dialog: MatDialog) {}
+  constructor(private exportService: ExportService, private dialog: MatDialog) {}
+
 
 
   exportToExcel() {
-    this.exportService.exportPostingsToExcel().subscribe(
+    this.exportService.exportDataToExcel().subscribe(
       (data: Blob) => {
         const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         const url = window.URL.createObjectURL(blob);
@@ -33,6 +34,7 @@ export class TransactionPostingsComponent {
       }
     );
   }
+
   openDialog(posting: Posting): void {
     this.dialog.open(PostingDetailsComponent, {
       data: posting

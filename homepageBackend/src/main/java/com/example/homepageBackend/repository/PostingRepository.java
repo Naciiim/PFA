@@ -1,5 +1,6 @@
 package com.example.homepageBackend.repository;
 
+import com.example.homepageBackend.model.dto.PostingRequestDTO;
 import com.example.homepageBackend.model.entity.Posting;
 import com.example.homepageBackend.model.entity.PostingPK;
 import org.springframework.data.domain.Page;

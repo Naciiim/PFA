@@ -4,6 +4,8 @@ import com.example.homepageBackend.model.dto.PostingDTO;
 import com.example.homepageBackend.model.dto.PostingRequestDTO;
 import com.example.homepageBackend.service.ExportServiceImpl;
 import com.example.homepageBackend.service.HomePageServiceImpl;
+import com.example.homepageBackend.service.PostingServiceImpl;
+import com.example.homepageBackend.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -26,40 +29,71 @@ public class PostingController {
 
     @Autowired
     private ExportServiceImpl exportServiceImpl;
+    @Autowired
+    private PostingServiceImpl postingServiceImpl;
 
-    // Variable pour stocker les postings récupérés
-    private final List<PostingDTO> cachedPostings= new ArrayList<>();;
+    // Variables pour stocker les postings en cache
+    private final List<PostingDTO> cachedPostings = new ArrayList<>();
+    private final List<PostingDTO> postingWithDiffEtat = new ArrayList<>();
 
     @PostMapping("/getPosting")
     public ResponseEntity<Map<String, Object>> getPostings(@RequestBody PostingRequestDTO postingRequest) {
         System.out.println("Received DTO: " + postingRequest);
+
         Map<String, Object> response = homepageServiceImpl.validateAndRetrieveData(postingRequest);
 
-        // Accumuler tous les postings récupérés
-        List<PostingDTO> postings = (List<PostingDTO>) response.get("POSTINGSEARCHED");
-        System.out.println("Postings: " + postings);
-        cachedPostings.addAll(postings); // Ajouter les postings récupérés à la liste en cache
+        if (response == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
 
-        System.out.println("Cached Postings: " + cachedPostings);
+        List<PostingDTO> postings = (List<PostingDTO>) response.get("POSTINGSEARCHED");
+        if (postings == null) {
+            postings = new ArrayList<>();
+        }
+
+        // Handle cache only if it's the first page
+        if (postingRequest.getPage() == 0) {
+            System.out.println("First page request, clearing cache...");
+            cachedPostings.clear();
+            postingWithDiffEtat.clear();
+
+            // Add postings with different states to the list
+            List<PostingDTO> postingsWithDiffEtat = (List<PostingDTO>) response.get("postingWithDiffEtat");
+            if (postingsWithDiffEtat != null) {
+                postingWithDiffEtat.addAll(postingsWithDiffEtat);
+            }
+
+            // Use utility function to handle pagination
+            Utils.paginateAndCachePostings(postingRequest, homepageServiceImpl, cachedPostings, postingWithDiffEtat);
+            Utils.paginateAndCachePostingsWithDiffEtat(postingRequest, postingServiceImpl, postingWithDiffEtat);
+        } else {
+            // Paginate postings with different states based on the current page
+            Utils.paginateAndCachePostingsWithDiffEtat(postingRequest, postingServiceImpl, postingWithDiffEtat);
+        }
+
+        System.out.println("Paginated postings with diff etat: " + postingWithDiffEtat);
+
+        response.put("postingWithDiffEtat", postingWithDiffEtat);
         return ResponseEntity.ok(response);
     }
+
 
 
     @GetMapping("/exportPostings")
     public void exportPostings(HttpServletResponse response) {
         try {
-            // Vérifier si les postings sont en cache
-            if (cachedPostings == null || cachedPostings.isEmpty()) {
+            // Vérifier si les postings sont disponibles
+            if (cachedPostings.isEmpty()) {
                 response.setStatus(HttpStatus.NO_CONTENT.value());
                 response.getWriter().write("Aucun posting disponible pour l'exportation");
                 return;
             }
 
-            // Configurez la réponse pour l'exportation Excel
+            // Configurer la réponse pour l'exportation Excel
             response.setContentType("application/octet-stream");
             response.setHeader("Content-Disposition", "attachment; filename=postings.xlsx");
 
-            // Créer un flux de sortie pour écrire le fichier Excel
+            // Créer un flux de sortie pour le fichier Excel
             try (OutputStream outputStream = response.getOutputStream()) {
                 exportServiceImpl.exportToExcel(cachedPostings, outputStream);
                 outputStream.flush();
@@ -69,5 +103,4 @@ public class PostingController {
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
     }
-
 }

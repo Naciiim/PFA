@@ -22,7 +22,12 @@
         <td class="whitespace-nowrap py-4 px-6 text-center">{{ data.transactionid }}</td>
         <td class="whitespace-nowrap py-4 px-6 text-center">{{ data.transactionseqno }}</td>
         <td class="whitespace-nowrap py-4 px-6 text-center">{{ data.backofficeaccountno }}</td>
-        <td class="whitespace-nowrap py-4 px-6 text-center">{{ data.etat }}
+        <td class="whitespace-nowrap py-4 px-6 text-center">
+            <span [ngClass]="{
+              'text-green-500': data.etat === 'T',
+              'text-red-500': data.etat === 'M',
+              'text-yellow-500': data.etat === 'N'
+            }">{{ data.etat }}</span>
         </td>
       </tr>
       </tbody>
