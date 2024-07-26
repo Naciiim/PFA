@@ -87,33 +87,31 @@ public class PostingController {
 
 
     @GetMapping("/exportPostings")
-    public void exportPostings(@RequestParam(required = false) String type, HttpServletResponse response) {
+    public void exportPostings(HttpServletResponse response) {
         try {
-            List<PostingDTO> postingsToExport;
+            List<PostingDTO> postingsToExport = new ArrayList<>();
 
-            if ("cached".equals(type)) {
-                postingsToExport = cachedPostings;
-            } else if ("diffEtat".equals(type)) {
-                // Retrieve all pages of postings with different states
-                postingsToExport = postingServiceImpl.getAllPostingsWithDifferentEtat();
-            } else {
-                postingsToExport = new ArrayList<>();
+            if (!cachedPostings.isEmpty()) {
                 postingsToExport.addAll(cachedPostings);
-                postingsToExport.addAll(postingServiceImpl.getAllPostingsWithDifferentEtat());
+            }else {
+                List<PostingDTO> allPostingsWithDiffEtat = postingServiceImpl.getAllPostingsWithDifferentEtat();
+                postingsToExport.addAll(allPostingsWithDiffEtat);
             }
 
-            // Check if postings are available
+            // Logging for debugging
+            System.out.println("Cached postings count: " + cachedPostings.size());
+            System.out.println("Postings with different state count: " + postingWithDiffEtat.size());
+            System.out.println("Total postings to export: " + postingsToExport.size());
+
             if (postingsToExport.isEmpty()) {
                 response.setStatus(HttpStatus.NO_CONTENT.value());
                 response.getWriter().write("Aucun posting disponible pour l'exportation");
                 return;
             }
 
-            // Configure the response for exporting as Excel
             response.setContentType("application/octet-stream");
             response.setHeader("Content-Disposition", "attachment; filename=postings.xlsx");
 
-            // Create an output stream for the Excel file
             try (OutputStream outputStream = response.getOutputStream()) {
                 exportServiceImpl.exportToExcel(postingsToExport, outputStream);
                 outputStream.flush();
@@ -123,10 +121,6 @@ public class PostingController {
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
     }
-
-
-
-
 
 }
 
