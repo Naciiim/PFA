@@ -1,5 +1,6 @@
 package com.example.homepageBackend.service;
 
+import com.example.homepageBackend.model.dto.MouvementDTO;
 import com.example.homepageBackend.model.dto.PostingDTO;
 import com.example.homepageBackend.model.dto.PostingRequestDTO;
 import com.example.homepageBackend.model.entity.Posting;
@@ -20,6 +21,6 @@ public interface PostingService {
 
   List<PostingDTO> getAllPostingsWithDifferentEtat() ;
 
-
+    List<MouvementDTO> findMouvementsFromPosting(String transactionid, String masterreference);
 
     }

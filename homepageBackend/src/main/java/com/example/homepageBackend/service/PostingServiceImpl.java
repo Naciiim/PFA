@@ -1,9 +1,15 @@
 package com.example.homepageBackend.service;
 
+import com.example.homepageBackend.model.dto.MouvementDTO;
 import com.example.homepageBackend.model.dto.PostingDTO;
 import com.example.homepageBackend.model.dto.PostingRequestDTO;
+import com.example.homepageBackend.model.entity.Mouvement;
+import com.example.homepageBackend.model.entity.MouvementTrf;
 import com.example.homepageBackend.model.entity.Posting;
+import com.example.homepageBackend.model.mapper.MouvementMapper;
 import com.example.homepageBackend.model.mapper.PostingMapper;
+import com.example.homepageBackend.repository.MouvementRepository;
+import com.example.homepageBackend.repository.MouvementTrfRepository;
 import com.example.homepageBackend.repository.PostingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,6 +28,13 @@ public class PostingServiceImpl implements PostingService {
 
     @Autowired
     private PostingMapper postingMapper;
+    @Autowired
+    private MouvementRepository mouvementRepository;
+
+    @Autowired
+    private MouvementTrfRepository mouvementTrfRepository;
+    @Autowired
+    private MouvementMapper mouvementMapper;
 
     @Override
     public Page<PostingDTO> getPostingsByTransactionId(String transactionid, Pageable pageable) {
@@ -75,5 +88,21 @@ public class PostingServiceImpl implements PostingService {
         return allPostings;
     }
 
+    @Override
+    public List<MouvementDTO> findMouvementsFromPosting(String transactionid, String masterreference) {
+        List<Posting> postings = postingRepository.findById_TransactionidAndMasterreference(transactionid, masterreference, Pageable.unpaged()).getContent();
+        List<MouvementDTO> mouvementDTOs = new ArrayList<>();
+
+        for (Posting posting : postings) {
+            String reference = posting.getMasterreference();
+            List<Mouvement> mouvements = mouvementRepository.findByReference(reference, Pageable.unpaged()).getContent();
+            List<MouvementTrf> mouvementsTrf = mouvementTrfRepository.findByReference(reference, Pageable.unpaged()).getContent();
+
+            mouvementDTOs.addAll(mouvementMapper.toDtoList(mouvements));
+            mouvementDTOs.addAll(mouvementMapper.toDtoTrfList(mouvementsTrf));
+        }
+
+        return mouvementDTOs;
+    }
 }
 

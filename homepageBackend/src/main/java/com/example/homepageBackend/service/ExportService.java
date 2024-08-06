@@ -7,5 +7,5 @@ import java.io.OutputStream;
 import java.util.List;
 
 public interface ExportService {
-    void exportToExcel(List<PostingDTO> postings, OutputStream outputStream) throws IOException;
+    void exportToExcel(List<?> dataList, OutputStream outputStream) throws IOException;
 }

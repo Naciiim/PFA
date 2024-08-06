@@ -4,14 +4,14 @@
   <main class="flex-1 ml-48 p-4"> <!-- Ensure the margin-left accommodates the sidebar width -->
     <!-- Zone de recherche -->
     <div class="container mx-auto p-4">
-      <form (submit)="searchPostings()" class="mb-4 flex space-x-4">
+      <form (submit)="searchMouvements()" class="mb-4 flex space-x-4">
         <div>
           <label for="transactionId" class="block text-sm font-medium text-gray-700">ID de transaction</label>
           <input type="text" id="transactionId" [(ngModel)]="transactionid" name="transactionId" class="mt-1 border-gray-300 border p-2 w-full">
         </div>
         <div>
-          <label for="masterReference" class="block text-sm font-medium text-gray-700">Référence</label>
-          <input type="text" id="masterReference" [(ngModel)]="masterreference" name="masterReference" class="mt-1 border-gray-300 border p-2 w-full">
+          <label for="reference" class="block text-sm font-medium text-gray-700">Référence</label>
+          <input type="text" id="reference" [(ngModel)]="reference" name="reference" class="mt-1 border-gray-300 border p-2 w-full">
         </div>
         <div>
           <label for="eventReference" class="block text-sm font-medium text-gray-700">Event</label>
@@ -21,13 +21,14 @@
           <button type="submit" class="mt-2 bg-gray-800 hover:bg-gray-900 text-white font-bold py-2 px-4 rounded">Rechercher</button>
         </div>
       </form>
+
       <!-- Affichage des messages d'erreur -->
-      <div *ngIf="errorMessage || backendErrorMessage" id="alert-border-2" class="flex items-center p-4 mb-4 text-red-800 border-t-4 border-red-300 bg-red-50 dark:text-red-400 dark:bg-gray-800 dark:border-red-800" role="alert">
+      <div *ngIf="errorMessage" id="alert-border-2" class="flex items-center p-4 mb-4 text-red-800 border-t-4 border-red-300 bg-red-50 dark:text-red-400 dark:bg-gray-800 dark:border-red-800" role="alert">
         <svg class="flex-shrink-0 w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
           <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
         </svg>
         <div class="ms-3 text-sm font-medium">
-          {{ errorMessage || backendErrorMessage }}
+          {{ errorMessage }}
         </div>
         <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-red-50 text-red-500 rounded-lg focus:ring-2 focus:ring-red-400 p-1.5 hover:bg-red-200 inline-flex items-center justify-center h-8 w-8 dark:bg-gray-800 dark:text-red-400 dark:hover:bg-gray-700" (click)="dismissError()">
           <span class="sr-only">Dismiss</span>
@@ -37,15 +38,10 @@
         </button>
       </div>
     </div>
-
-    <!-- Display default postings -->
-    <app-default-postings *ngIf="(defaultPostings.length > 0 || noPostings.length === 0) && transactionPostings.length === 0" [postings]="defaultPostings"></app-default-postings>
-
-    <!-- Display transaction postings -->
-    <app-transaction-postings *ngIf="transactionPostings.length > 0" [postings]="transactionPostings"></app-transaction-postings>
-
-    <!-- Pagination for transaction postings -->
-    <div *ngIf="transactionPostings.length > 0" class="flex justify-center mt-4">
+    <app-default-mouvements *ngIf="(defaultMouvements.length>0 || noMouvements.length===0) && searchedMouvements.length===0" [mouvements]="defaultMouvements"></app-default-mouvements>
+    <app-transaction-mouvement *ngIf="searchedMouvements.length > 0" [mouvements]="searchedMouvements"> </app-transaction-mouvement>
+    <!-- Pagination for mouvement -->
+    <div *ngIf="searchedMouvements.length > 0" class="flex justify-center mt-4">
       <nav aria-label="Pagination">
         <ul class="flex items-center -space-x-px h-8 text-sm">
           <li>
@@ -72,9 +68,8 @@
         </ul>
       </nav>
     </div>
-
-    <!-- Pagination for default postings -->
-    <div *ngIf="defaultPostings.length > 0 && transactionPostings.length == 0" class="flex justify-center mt-4">
+    <!-- Pagination for default mouvement -->
+    <div *ngIf="defaultMouvements.length > 0 && searchedMouvements.length == 0" class="flex justify-center mt-4">
       <nav aria-label="Pagination">
         <ul class="flex items-center -space-x-px h-8 text-sm">
           <li>

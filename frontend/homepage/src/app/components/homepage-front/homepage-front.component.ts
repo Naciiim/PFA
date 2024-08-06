@@ -15,7 +15,7 @@ export class HomepageFrontComponent implements OnInit {
   defaultPostings: Posting[] = [];
   noPostings : Posting[]=[];
   transactionPostings: Posting[] = [];
-  allPostings: Posting[] = [];
+  backendErrorMessage: string = '';
   errorMessage: string = '';
   currentPage: number = 1;
   totalPages: number = 1;
@@ -33,24 +33,30 @@ export class HomepageFrontComponent implements OnInit {
       transactionid: '',
       masterreference: '',
       eventreference: '',
-      page: this.currentPageWithDiffEtat - 1,  // Assurez-vous que le numéro de page est correct
+      page: this.currentPageWithDiffEtat - 1,
       size: 10
     };
     this.postingService.getPostings(defaultRequest).subscribe(
       response => {
-        console.log('Réponse pour les postings avec état différent:', response);
         if (response) {
-          this.defaultPostings = response.postingWithDiffEtat || [];
-          this.totalPagesWithDiffEtat = response.totalPagesWithDiffEtat || 1;
+          if (response.postingWithDiffEtat && response.postingWithDiffEtat.length > 0) {
+            this.defaultPostings = response.postingWithDiffEtat;
+            this.totalPagesWithDiffEtat = response.totalPagesWithDiffEtat || 1;
+            this.backendErrorMessage = ''; // Réinitialiser le message d'erreur en cas de succès
+          } else {
+            this.defaultPostings = [];
+            this.totalPagesWithDiffEtat = 1;
+            this.backendErrorMessage = response.message || 'Aucun posting trouvé avec état différent.';
+          }
         }
       },
       error => {
         console.error('Erreur lors de la récupération des postings par défaut :', error);
         this.errorMessage = 'Une erreur est survenue lors de la récupération des postings par défaut';
+        this.backendErrorMessage = error.message || 'Une erreur inconnue est survenue'; // Réinitialiser le message d'erreur en cas de problème avec l'API
       }
     );
   }
-
 
   private loadPostings() {
     const request = {
@@ -64,16 +70,25 @@ export class HomepageFrontComponent implements OnInit {
     this.postingService.getPostings(request).subscribe(
       response => {
         if (response) {
-          this.transactionPostings = response.POSTINGSEARCHED || [];
-          this.totalPages = response.totalPages || 1;
+          if (response.POSTINGSEARCHED && response.POSTINGSEARCHED.length > 0) {
+            this.transactionPostings = response.POSTINGSEARCHED;
+            this.totalPages = response.totalPages || 1;
+            this.backendErrorMessage = ''; // Réinitialiser le message d'erreur en cas de succès
+          } else {
+            this.transactionPostings = [];
+            this.totalPages = 1;
+            this.backendErrorMessage = response.message || 'Aucun posting trouvé.';
+          }
         }
       },
       error => {
         console.error('Erreur lors de la récupération des postings :', error);
         this.errorMessage = 'Une erreur est survenue lors de la récupération des postings';
+        this.backendErrorMessage = error.message || 'Une erreur inconnue est survenue'; // Réinitialiser le message d'erreur en cas de problème avec l'API
       }
     );
   }
+
 
   searchPostings() {
     if (!this.transactionid && !this.masterreference) {
@@ -81,11 +96,11 @@ export class HomepageFrontComponent implements OnInit {
       return;
     }
 
-    this.currentPage = 1; // Reset to first page on new search
-    this.allPostings = []; // Clear previous search results
-
+    this.currentPage = 1; // Réinitialiser à la première page lors de la nouvelle recherche
     this.loadPostings();
   }
+
+
   prevPage() {
     if (this.currentPage > 1) {
       this.currentPage--;

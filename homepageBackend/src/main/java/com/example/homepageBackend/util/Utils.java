@@ -1,19 +1,18 @@
 package com.example.homepageBackend.util;
 
+import com.example.homepageBackend.model.dto.MouvementDTO;
+import com.example.homepageBackend.model.dto.MouvementRequestDTO;
 import com.example.homepageBackend.model.dto.PostingDTO;
 import com.example.homepageBackend.model.dto.PostingRequestDTO;
 import com.example.homepageBackend.service.ExportServiceImpl;
 import com.example.homepageBackend.service.HomePageServiceImpl;
+import com.example.homepageBackend.service.MouvementServiceImpl;
 import com.example.homepageBackend.service.PostingServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -63,7 +62,7 @@ public class Utils {
         do {
             postingRequest.setPage(page);
             System.out.println("Requesting page: " + page);
-            Map<String, Object> pagedResponse = homepageServiceImpl.validateAndRetrieveData(postingRequest);
+            Map<String, Object> pagedResponse = homepageServiceImpl.findPostings(postingRequest);
             if (pagedResponse == null) {
                 break;
             }
@@ -108,6 +107,61 @@ public class Utils {
         System.out.println("Has more pages: " + (pagedPostingsWithDiffEtat != null ? pagedPostingsWithDiffEtat.hasNext() : false));
     }
 
+    public static void paginateAndCacheMouvements(MouvementRequestDTO mouvementRequest,
+                                                  HomePageServiceImpl homepageServiceImpl,
+                                                  List<MouvementDTO> cachedMouvements,
+                                                  List<MouvementDTO> mouvementWithDiffEtat) {
+        int page = 0;
+        boolean hasMorePages = true;
+        do {
+            mouvementRequest.setPage(page);
+            System.out.println("Requesting page: " + page);
+            Map<String, Object> pagedResponse = homepageServiceImpl.findMouvements(mouvementRequest);
+            if (pagedResponse == null) {
+                break;
+            }
+            List<MouvementDTO> pagedMouvements = (List<MouvementDTO>) pagedResponse.get("mvtSearched");
+            if (pagedMouvements != null && !pagedMouvements.isEmpty()) {
+                cachedMouvements.addAll(pagedMouvements);
+                mouvementWithDiffEtat.addAll(pagedMouvements.stream()
+                        .filter(mouvement -> !mouvement.getEtat().equals("T"))
+                        .collect(Collectors.toList()));
+            }
+            Integer totalPages = (Integer) pagedResponse.get("totalPages");
+            hasMorePages = totalPages != null && page < totalPages - 1;
+            page++;
+            System.out.println("Total pages: " + totalPages + ", Has more pages: " + hasMorePages);
+            System.out.println("Cached mouvements after page " + page + ": " + cachedMouvements);
+            System.out.println("Mouvements with different etat after page " + page + ": " + mouvementWithDiffEtat);
+        } while (hasMorePages);
+    }
+
+    public static void paginateAndCacheMouvementsWithDiffEtat(MouvementRequestDTO mouvementRequest,
+                                                              MouvementServiceImpl mouvementServiceImpl,
+                                                              List<MouvementDTO> mouvementWithDiffEtat) {
+        int page = mouvementRequest.getPage(); // Page requested
+        int size = mouvementRequest.getSize(); // Page size
+
+        // Create a PageRequest with the current page and size
+        PageRequest pageRequest = PageRequest.of(page, size);
+
+        // Fetch paginated mouvements with different states
+        Page<MouvementDTO> pagedMouvementsWithDiffEtat = mouvementServiceImpl.getMouvementsWithDifferentEtat(pageRequest);
+
+        // Clear the existing mouvements
+        mouvementWithDiffEtat.clear();
+
+        // Add the mouvements of the current page to the list
+        if (pagedMouvementsWithDiffEtat != null && pagedMouvementsWithDiffEtat.hasContent()) {
+            mouvementWithDiffEtat.addAll(pagedMouvementsWithDiffEtat.getContent());
+        }
+        int totalPages = pagedMouvementsWithDiffEtat != null ? pagedMouvementsWithDiffEtat.getTotalPages() : 0;
+        boolean hasNextPage = pagedMouvementsWithDiffEtat != null && pagedMouvementsWithDiffEtat.hasNext();
+        // Log the results for debugging
+        System.out.println("Paginated mouvements with different etat: " + mouvementWithDiffEtat);
+        System.out.println("Total pages: " + totalPages);
+        System.out.println("Has more pages: " + hasNextPage);
+    }
 
 }
 

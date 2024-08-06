@@ -1,10 +1,14 @@
   <div *ngIf="postings.length > 0" class="mt-4 relative">
     <h2 class="text-lg font-bold mb-2 text-center">Transaction Postings</h2>
-   <div class="absolute top-3 right-10">
-    <button (click)="exportToExcel()" class="relative float-right bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
+   <div class="absolute top-3 right-10 flex space-x-4">
+    <button (click)="exportToExcel()" class="relative float-right bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br text-white px-3 py-1 rounded hover:bg-green-600">
       Export
     </button>
+<!--      <button (click)="exportToMouvementsExcel()" class="relative float-right bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 hover:bg-gradient-to-br text-white px-3 py-1 rounded hover:bg-blue-600">-->
+<!--        Export Mouvements-->
+<!--      </button>-->
   </div>
+
     <div>
     <div class="shadow-lg rounded-lg overflow-x-auto mx-4 md:mx-10">
        <table class="min-w-full divide-y divide-gray-200">
@@ -14,9 +18,6 @@
             <th class=" whitespace-nowrap py-4 px-6 text-center text-gray-600 font-bold uppercase">Transaction Seq No</th>
             <th class=" whitespace-nowrap py-4 px-6 text-center text-gray-600 font-bold uppercase">Bank Account Seq No</th>
             <th class=" whitespace-nowrap py-4 px-6 text-center text-gray-600 font-bold uppercase">Account Type</th>
-            <th class=" whitespace-nowrap py-4 px-6 text-center text-gray-600 font-bold uppercase">Debit/Credit Flag</th>
-            <th class=" whitespace-nowrap py-4 px-6 text-center text-gray-600 font-bold uppercase">Posting Currency</th>
-            <th class=" whitespace-nowrap py-4 px-6 text-center text-gray-600 font-bold uppercase">Posting Amount</th>
             <th class=" whitespace-nowrap py-4 px-6 text-center text-gray-600 font-bold uppercase">Etat</th>
           </tr>
           </thead>
@@ -28,9 +29,6 @@
               {{ posting.backofficeaccountno | slice:0:20 }}{{ posting.backofficeaccountno.length > 20 ? '...' : '' }}
             </td>
             <td class="whitespace-nowrap py-4 px-8 text-center">{{ posting.accounttype }}</td>
-            <td class="whitespace-nowrap py-4 px-6 text-center">{{ posting.debitcreditflag }}</td>
-            <td class="whitespace-nowrap py-4 px-6 text-center">{{ posting.postingccy }}</td>
-            <td class="whitespace-nowrap py-4 px-6 text-center">{{ posting.postingamount }}</td>
             <td class="whitespace-nowrap py-4 px-6 text-center">
               <span [ngClass]="{
                 'text-green-500': posting.etat === 'T',

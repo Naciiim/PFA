@@ -6,6 +6,7 @@ import com.example.homepageBackend.model.entity.PostingPK;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,4 +20,7 @@ public interface PostingRepository extends JpaRepository<Posting, PostingPK> {
   Page<Posting> findByMasterreferenceAndEventreference(String masterreference, String eventreference, Pageable pageable);
   Page<Posting> findById_TransactionidAndMasterreferenceAndEventreference(String transactionid, String masterreference, String eventreference, Pageable pageable);
   Page<Posting> findByEtatNot(String etat,Pageable pageable);
+  @Query("SELECT p.masterreference FROM Posting p WHERE p.id.transactionid = :transactionid")
+
+  List<String> findMasterreferenceById_Transactionid(String transactionid,Pageable pageable);
 }

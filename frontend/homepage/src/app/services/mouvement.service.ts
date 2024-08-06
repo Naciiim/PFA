@@ -1,18 +1,18 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import {catchError, Observable, throwError} from 'rxjs';
-import { Posting } from '../models/posting.model';
+import { Mouvement } from '../models/mouvement.model';
 
 @Injectable({
   providedIn: 'root'
 })
-export class PostingService {
-  private apiUrl = 'http://localhost:8080/api';
+export class MouvementService {
+  private baseUrl = 'http://localhost:8080/api/getMouvement'; // Replace with your backend API URL
 
   constructor(private http: HttpClient) {}
 
-  getPostings(request: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/getPosting`, request).pipe(
+  getMouvements(request: any): Observable<any> {
+    return this.http.post<any>(this.baseUrl, request).pipe(
       catchError(error => {
         let errorMessage = 'Une erreur est survenue';
         if (error.error && error.error.message) {
@@ -22,5 +22,6 @@ export class PostingService {
       })
     );
   }
+
 
 }

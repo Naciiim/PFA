@@ -13,7 +13,8 @@ import {ExportService} from "../../services/export.service";
 export class TransactionPostingsComponent {
   @Input() postings: Posting[] = [];
 
-  constructor(private exportService: ExportService, private dialog: MatDialog) {}
+
+  constructor(protected exportService: ExportService, private dialog: MatDialog) {}
 
 
 

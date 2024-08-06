@@ -1,5 +1,6 @@
 package com.example.homepageBackend.service;
 
+import com.example.homepageBackend.model.dto.MouvementDTO;
 import com.example.homepageBackend.model.dto.PostingDTO;
 import com.example.homepageBackend.util.DatabaseUtils;
 import com.example.homepageBackend.util.Utils;
@@ -18,20 +19,38 @@ import java.util.List;
 public class ExportServiceImpl implements ExportService {
 
     @Override
-    public void exportToExcel(List<PostingDTO> postings, OutputStream outputStream) throws IOException {
-        if (postings == null || postings.isEmpty()) {
-            throw new IllegalArgumentException("La liste des postings est null ou vide");
+    public void exportToExcel(List<?> dataList, OutputStream outputStream) throws IOException {
+        if (dataList == null || dataList.isEmpty()) {
+            throw new IllegalArgumentException("La liste des dataList est null ou vide");
+        }
+        Object firstItem = dataList.get(0);
+        List<String> columnNames;
+        String sheetName;
+
+        if (firstItem instanceof PostingDTO) {
+            columnNames = DatabaseUtils.getDatabaseColumnNames("POSTING");
+            sheetName = "Postings";
+        } else if (firstItem instanceof MouvementDTO) {
+            // Vérifier si c'est un MouvementTRF par la référence
+            MouvementDTO firstMouvement = (MouvementDTO) firstItem;
+            if (firstMouvement.getReference().startsWith("TRF")) {
+                columnNames = DatabaseUtils.getDatabaseColumnNames("MOUVEMENT_TRF");
+                sheetName = "Mouvements TRF";
+            } else {
+                columnNames = DatabaseUtils.getDatabaseColumnNames("MOUVEMENT");
+                sheetName = "Mouvements";
+            }
+        } else {
+            throw new IllegalArgumentException("Type de données non supporté");
+        }
+
+        if (columnNames == null || columnNames.isEmpty()) {
+            throw new IllegalStateException("La liste des noms de colonnes est null ou vide");
         }
 
         try (Workbook workbook = new XSSFWorkbook()) {
-            Sheet sheet = workbook.createSheet("Postings");
+            Sheet sheet = workbook.createSheet(sheetName);
 
-            // Récupérer les noms de colonnes depuis le premier objet PostingDTO
-            List<String> columnNames = DatabaseUtils.getDatabaseColumnNames("POSTING");
-
-            if (columnNames == null || columnNames.isEmpty()) {
-                throw new IllegalStateException("La liste des noms de colonnes est null ou vide");
-            }
 
             // Créer la ligne d'en-tête dynamiquement
             Row headerRow = sheet.createRow(0);
@@ -54,18 +73,18 @@ public class ExportServiceImpl implements ExportService {
 
             // Créer les lignes de données
             int rowIdx = 1;
-            for (PostingDTO posting : postings) {
-                if (posting == null) {
-                    continue; // Ignorer les éléments null dans postings
+            for (Object dataItem : dataList) {
+                if (dataItem == null) {
+                    continue; // Ignorer les éléments null dans dataList
                 }
                 Row row = sheet.createRow(rowIdx++);
                 for (int i = 0; i < columnNames.size(); i++) {
                     String columnName = columnNames.get(i);
-                    Method getter = Utils.findGetterMethod(posting, Utils.convertColumnNameToFieldName(columnName));
+                    Method getter = Utils.findGetterMethod(dataItem, Utils.convertColumnNameToFieldName(columnName));
 
                     if (getter != null) {
                         try {
-                            Object value = getter.invoke(posting);
+                            Object value = getter.invoke(dataItem);
                             Cell cell = row.createCell(i);
                             if (value != null) {
                                 if (value instanceof Date) {
