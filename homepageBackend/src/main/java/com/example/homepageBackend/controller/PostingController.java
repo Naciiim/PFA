@@ -174,7 +174,7 @@ public class PostingController {
 
             if (!cachedMouvements.isEmpty()) {
                 mouvementsToExport.addAll(cachedMouvements);
-            }else {
+            } else {
                 List<MouvementDTO> allMouvementsWithDiffEtat = mouvementServiceImpl.getAllMouvementsWithDifferentEtat();
                 mouvementsToExport.addAll(allMouvementsWithDiffEtat);
             }
@@ -202,5 +202,6 @@ public class PostingController {
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
     }
+
 
 }
