@@ -1,15 +1,10 @@
 package com.example.homepageBackend.util;
 
-import com.example.homepageBackend.model.dto.PostingDTO;
-import com.example.homepageBackend.model.entity.Mouvement;
-import com.example.homepageBackend.model.entity.MouvementTrf;
-import com.example.homepageBackend.model.entity.Posting;
+
 import com.example.homepageBackend.repository.MouvementRepository;
 import com.example.homepageBackend.repository.MouvementTrfRepository;
 import com.example.homepageBackend.repository.PostingRepository;
-import com.example.homepageBackend.service.ExportServiceImpl;
-import com.example.homepageBackend.service.PostingService;
-import com.example.homepageBackend.service.MouvementService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -20,15 +15,12 @@ import java.util.Optional;
 public class FileHandler {
 
     private final PostingRepository postingRepository;
-    private final PostingService postingService;
-    private final MouvementService mouvementService;
+
 private  final MouvementRepository mouvementRepository;
 private  final MouvementTrfRepository mouvementTrfRepository;
     @Autowired
-    public FileHandler(PostingRepository postingRepository, PostingService postingService, MouvementService mouvementService, MouvementRepository mouvementRepository, MouvementTrfRepository mouvementTrfRepository) {
+    public FileHandler(PostingRepository postingRepository, MouvementRepository mouvementRepository, MouvementTrfRepository mouvementTrfRepository) {
         this.postingRepository = postingRepository;
-        this.postingService = postingService;
-        this.mouvementService = mouvementService;
         this.mouvementRepository = mouvementRepository;
         this.mouvementTrfRepository = mouvementTrfRepository;
     }

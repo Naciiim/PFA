@@ -1,6 +1,5 @@
 package com.example.homepageBackend.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.io.Serializable;

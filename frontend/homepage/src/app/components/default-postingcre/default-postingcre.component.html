@@ -1,0 +1,48 @@
+<div class="mt-4 relative" *ngIf="postingCres.length > 0; else noPostings">
+  <h2 class="text-lg font-bold mb-2 text-center">Postings Instanciés</h2>
+  <div class="absolute top-3 right-10">
+    <button (click)="exportToExcel()" class="relative float-right bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br text-white px-3 py-1 rounded hover:bg-green-600">
+      Export
+    </button>
+  </div>
+  <div class="shadow-lg rounded-lg overflow-x-auto mx-4 md:mx-10">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead>
+      <tr class="bg-gray-100">
+        <th class="whitespace-nowrap py-4 px-6 text-center text-gray-600 font-bold uppercase">Transaction ID</th>
+        <th class="whitespace-nowrap py-4 px-6 text-center text-gray-600 font-bold uppercase">Type Cre</th>
+        <th class="whitespace-nowrap py-4 px-6 text-center text-gray-600 font-bold uppercase">Chaine Cre</th>
+        <th class="whitespace-nowrap py-4 px-6 text-center text-gray-600 font-bold uppercase">Date de création</th>
+        <th class="whitespace-nowrap py-4 px-6 text-center text-gray-600 font-bold uppercase">Etat</th>
+      </tr>
+      </thead>
+      <tbody class="bg-white">
+      <tr *ngFor="let postingCre of postingCres" class="border-b border-gray-200">
+        <td class="whitespace-nowrap py-4 px-6 text-center">{{ postingCre.transId }}</td>
+        <td class="whitespace-nowrap py-4 px-6 text-center">{{ postingCre.typeCre }}</td>
+        <td class="whitespace-nowrap py-4 px-6 text-center" (click)="openDialog(postingCre)" [title]="postingCre.chaineCre">
+          {{ postingCre.chaineCre | slice:0:20 }}{{ postingCre.chaineCre.length > 20 ? '...' : '' }}
+        </td>
+        <td class="whitespace-nowrap py-4 px-8 text-center">{{ postingCre.dateCreation }}</td>
+        <td class="whitespace-nowrap py-4 px-6 text-center">
+            <span [ngClass]="{
+              'text-green-500': postingCre.etat === 'O',
+              'text-red-500': postingCre.etat === 'M',
+              'text-yellow-500': postingCre.etat === 'N'
+            }">{{ postingCre.etat }}</span>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<ng-template #noPostings>
+  <div class="flex flex-col items-center border border-gray-200 rounded-lg shadow md:flex-row md:max-w-xl  dark:bg-gray-800 mx-auto mt-20 ">
+    <img class="object-cover w-full h-96 md:h-auto md:w-48 rounded-t-lg md:rounded-none md:rounded-l-lg" src="assets/test.jpg" alt="Test Image">
+    <div class="flex flex-col justify-between leading-normal p-4">
+      <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Aucun posting instancié</h5>
+      <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Vueillez chercher les postings dont vous avez besoin</p>
+    </div>
+  </div>
+</ng-template>

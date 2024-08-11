@@ -19,6 +19,10 @@ import { MouvementDetailsComponent } from './components/mouvement-details/mouvem
 import {MouvementComponent} from "./components/mouvement/mouvement.component";
 import {RouterModule} from "@angular/router";
 import { TransactionMouvementComponent } from './components/transaction-mouvement/transaction-mouvement.component';
+import { DefaultPostingcreComponent } from './components/default-postingcre/default-postingcre.component';
+import { PostingcreDetailsComponent } from './components/postingcre-details/postingcre-details.component';
+import { PostingcreComponent } from './components/postingcre/postingcre.component';
+import { TransactionPostingcreComponent } from './components/transaction-postingcre/transaction-postingcre.component';
 
 
 
@@ -33,7 +37,11 @@ import { TransactionMouvementComponent } from './components/transaction-mouvemen
     DefaultMovementsComponent,
     MouvementDetailsComponent,
     MouvementComponent,
-    TransactionMouvementComponent
+    TransactionMouvementComponent,
+    DefaultPostingcreComponent,
+    PostingcreDetailsComponent,
+    PostingcreComponent,
+    TransactionPostingcreComponent
 
   ],
     imports: [

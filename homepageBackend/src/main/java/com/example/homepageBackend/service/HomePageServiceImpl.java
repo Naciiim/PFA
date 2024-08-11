@@ -1,14 +1,12 @@
 package com.example.homepageBackend.service;
 
-import com.example.homepageBackend.model.dto.MouvementDTO;
-import com.example.homepageBackend.model.dto.MouvementRequestDTO;
-import com.example.homepageBackend.model.dto.PostingDTO;
-import com.example.homepageBackend.model.dto.PostingRequestDTO;
+import com.example.homepageBackend.model.dto.*;
 import com.example.homepageBackend.model.entity.Mouvement;
 import com.example.homepageBackend.model.entity.MouvementTrf;
 import com.example.homepageBackend.model.mapper.MouvementMapper;
 import com.example.homepageBackend.repository.MouvementRepository;
 import com.example.homepageBackend.repository.MouvementTrfRepository;
+import com.example.homepageBackend.repository.PostingCreRepository;
 import com.example.homepageBackend.util.FileHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +37,10 @@ public class HomePageServiceImpl implements HomePageService {
     private MouvementTrfRepository mouvementTrfRepository;
     @Autowired
     private MouvementMapper mouvementMapper;
+    @Autowired
+    private PostingCreRepository postingCreRepository;
+    @Autowired
+    private PostingCreServiceImpl postingCreServiceImpl;
 
     @Autowired
     private FileHandler fileHandler;
@@ -116,7 +118,7 @@ public class HomePageServiceImpl implements HomePageService {
             } else if (postingRequest.getTransactionid() != null && !postingRequest.getTransactionid().isEmpty() &&
                     postingRequest.getMasterreference() != null && !postingRequest.getMasterreference().isEmpty() &&
                     postingRequest.getEventreference() != null && !postingRequest.getEventreference().isEmpty()) {
-                boolean isValid = fileHandler.isValidPostingCombination4(postingRequest.getTransactionid(),postingRequest.getMasterreference(),postingRequest.getEventreference());
+                boolean isValid = fileHandler.isValidPostingCombination4(postingRequest.getTransactionid(), postingRequest.getMasterreference(), postingRequest.getEventreference());
                 if (!isValid) {
                     response.put("message", "La combinaison n'est pas valide.");
                     return response;
@@ -250,5 +252,84 @@ public class HomePageServiceImpl implements HomePageService {
         return response;
     }
 
+    @Override
+    public Map<String, Object> findPostingCres(PostingCreRequestDTO postingCreRequestDTO) {
+        Map<String, Object> response = new LinkedHashMap<>();
+        Pageable pageable = PageRequest.of(postingCreRequestDTO.getPage(), postingCreRequestDTO.getSize());
+
+        try {
+            Page<PostingCreDTO> postingCreWithDifferentEtat = postingCreServiceImpl.getPostingCresWithDifferentEtat(pageable);
+            List<PostingCreDTO> postingCresListWithDifferentEtat = postingCreWithDifferentEtat.getContent();
+            response.put("postingCreWithDiffEtat", postingCresListWithDifferentEtat);
+            response.put("totalPagesWithDiffEtat", postingCreWithDifferentEtat.getTotalPages());
+            response.put("totalElementsWithDiffEtat", postingCreWithDifferentEtat.getTotalElements());
+
+            if (fileHandler.validateTransactionIdAndMasterReference(postingCreRequestDTO.getTransId(), postingCreRequestDTO.getMasterreference())) {
+
+                logger.warn("Validation échouée pour transactionid: {} et masterreference: {}",
+                        postingCreRequestDTO.getTransId(), postingCreRequestDTO.getMasterreference());
+                response.put("message", "Transaction ID et Master Reference ne peuvent pas être tous les deux vides.");
+                return response;
+            }
+
+            Page<PostingCreDTO> postingCresPage = null;
+            StringBuilder logMessage = new StringBuilder("Récupération des postingCres par ");
+
+            if (postingCreRequestDTO.getTransId() != null && !postingCreRequestDTO.getTransId().isEmpty()) {
+                logMessage.append("transactionid: ").append(postingCreRequestDTO.getTransId()).append(" ");
+            }
+            if (postingCreRequestDTO.getMasterreference() != null && !postingCreRequestDTO.getMasterreference().isEmpty()) {
+                logMessage.append("masterreference: ").append(postingCreRequestDTO.getMasterreference()).append(" ");
+            }
+            if (postingCreRequestDTO.getEventreference() != null && !postingCreRequestDTO.getEventreference().isEmpty()) {
+                logMessage.append("eventreference: ").append(postingCreRequestDTO.getEventreference()).append(" ");
+            }
+
+            logger.info(logMessage.toString());
+
+            if (postingCreRequestDTO.getTransId() != null && !postingCreRequestDTO.getTransId().isEmpty() &&
+                    (postingCreRequestDTO.getMasterreference() == null || postingCreRequestDTO.getMasterreference().isEmpty()) &&
+                    (postingCreRequestDTO.getEventreference() == null || postingCreRequestDTO.getEventreference().isEmpty())) {
+                //recherche par transactionID
+                postingCresPage = postingCreServiceImpl.getPostingCreByTransId(postingCreRequestDTO.getTransId(), pageable);
+            } else if (postingCreRequestDTO.getMasterreference() != null && !postingCreRequestDTO.getMasterreference().isEmpty() &&
+                    (postingCreRequestDTO.getTransId() == null || postingCreRequestDTO.getTransId().isEmpty()) &&
+                    (postingCreRequestDTO.getEventreference() == null || postingCreRequestDTO.getEventreference().isEmpty())) {
+                //recherche par masterReference
+                postingCresPage = postingCreServiceImpl.getPostingCreByMasterReferences(postingCreRequestDTO.getMasterreference(), pageable);
+            } else if (postingCreRequestDTO.getTransId() != null && !postingCreRequestDTO.getTransId().isEmpty() &&
+                    postingCreRequestDTO.getMasterreference() != null && !postingCreRequestDTO.getMasterreference().isEmpty() &&
+                    (postingCreRequestDTO.getEventreference() == null || postingCreRequestDTO.getEventreference().isEmpty())) {
+                //recherche par transactionID+masterReference
+                postingCresPage = postingCreServiceImpl.getPostingCreByMasterReferences(postingCreRequestDTO.getMasterreference(), pageable);
+            } else if (postingCreRequestDTO.getTransId() != null && !postingCreRequestDTO.getTransId().isEmpty() &&
+                    postingCreRequestDTO.getEventreference() != null && !postingCreRequestDTO.getEventreference().isEmpty() &&
+                    (postingCreRequestDTO.getMasterreference() == null || postingCreRequestDTO.getMasterreference().isEmpty())) {
+                //recherche par transactionID+eventReference
+                postingCresPage = postingCreServiceImpl.getPostingCreByTransId(postingCreRequestDTO.getTransId(), pageable);
+            } else if (postingCreRequestDTO.getMasterreference() != null && !postingCreRequestDTO.getMasterreference().isEmpty() &&
+                    postingCreRequestDTO.getEventreference() != null && !postingCreRequestDTO.getEventreference().isEmpty() &&
+                    (postingCreRequestDTO.getTransId() == null || postingCreRequestDTO.getTransId().isEmpty())) {
+                //recherche par masterReference+eventReference
+                     postingCresPage = postingCreServiceImpl.getPostingCreByReferences(postingCreRequestDTO.getMasterreference(),postingCreRequestDTO.getEventreference(),  pageable);
+            } else if (postingCreRequestDTO.getTransId() != null && !postingCreRequestDTO.getTransId().isEmpty() &&
+                    postingCreRequestDTO.getMasterreference() != null && !postingCreRequestDTO.getMasterreference().isEmpty() &&
+                    postingCreRequestDTO.getEventreference() != null && !postingCreRequestDTO.getEventreference().isEmpty()) {
+                //recherche par transactionID+masterReference+eventReference
+                    postingCresPage = postingCreServiceImpl.getPostingCreByReferences(postingCreRequestDTO.getMasterreference(),postingCreRequestDTO.getEventreference(), pageable);
+            }
+
+            List<PostingCreDTO> postingsList = postingCresPage.getContent();
+            response.put("postingCreSearched", postingsList);
+            response.put("totalPages", postingCresPage.getTotalPages());
+            response.put("totalElements", postingCresPage.getTotalElements());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("message", "Erreur lors de la récupération des mouvement.");
+        }
+
+        return response;
+    }
 
 }

@@ -1,11 +1,6 @@
 package com.example.homepageBackend.service;
 
-import com.example.homepageBackend.model.dto.MouvementDTO;
 import com.example.homepageBackend.model.dto.PostingDTO;
-import com.example.homepageBackend.model.dto.PostingRequestDTO;
-import com.example.homepageBackend.model.entity.Mouvement;
-import com.example.homepageBackend.model.entity.MouvementTrf;
-import com.example.homepageBackend.model.entity.Posting;
 import com.example.homepageBackend.model.mapper.MouvementMapper;
 import com.example.homepageBackend.model.mapper.PostingMapper;
 import com.example.homepageBackend.repository.MouvementRepository;
@@ -19,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
 @Service
 public class PostingServiceImpl implements PostingService {
 
@@ -88,21 +83,6 @@ public class PostingServiceImpl implements PostingService {
         return allPostings;
     }
 
-    @Override
-    public List<MouvementDTO> findMouvementsFromPosting(String transactionid, String masterreference) {
-        List<Posting> postings = postingRepository.findById_TransactionidAndMasterreference(transactionid, masterreference, Pageable.unpaged()).getContent();
-        List<MouvementDTO> mouvementDTOs = new ArrayList<>();
 
-        for (Posting posting : postings) {
-            String reference = posting.getMasterreference();
-            List<Mouvement> mouvements = mouvementRepository.findByReference(reference, Pageable.unpaged()).getContent();
-            List<MouvementTrf> mouvementsTrf = mouvementTrfRepository.findByReference(reference, Pageable.unpaged()).getContent();
-
-            mouvementDTOs.addAll(mouvementMapper.toDtoList(mouvements));
-            mouvementDTOs.addAll(mouvementMapper.toDtoTrfList(mouvementsTrf));
-        }
-
-        return mouvementDTOs;
-    }
 }
 

@@ -1,13 +1,7 @@
 package com.example.homepageBackend.util;
 
-import com.example.homepageBackend.model.dto.MouvementDTO;
-import com.example.homepageBackend.model.dto.MouvementRequestDTO;
-import com.example.homepageBackend.model.dto.PostingDTO;
-import com.example.homepageBackend.model.dto.PostingRequestDTO;
-import com.example.homepageBackend.service.ExportServiceImpl;
-import com.example.homepageBackend.service.HomePageServiceImpl;
-import com.example.homepageBackend.service.MouvementServiceImpl;
-import com.example.homepageBackend.service.PostingServiceImpl;
+import com.example.homepageBackend.model.dto.*;
+import com.example.homepageBackend.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -162,7 +156,59 @@ public class Utils {
         System.out.println("Total pages: " + totalPages);
         System.out.println("Has more pages: " + hasNextPage);
     }
+    public static void paginateAndCachePostingCres(PostingCreRequestDTO PostingCreRequest,
+                                                   HomePageServiceImpl homepageServiceImpl,
+                                                   List<PostingCreDTO> cachedPostingCres,
+                                                   List<PostingCreDTO> PostingCreWithDiffEtat) {
+        int page = 0;
+        boolean hasMorePages = true;
+        do {
+            PostingCreRequest.setPage(page);
+            System.out.println("Requesting page: " + page);
+            Map<String, Object> pagedResponse = homepageServiceImpl.findPostingCres(PostingCreRequest);
+            if (pagedResponse == null) {
+                break;
+            }
+            List<PostingCreDTO> pagedPostingCres = (List<PostingCreDTO>) pagedResponse.get("PostingCreSEARCHED");
+            if (pagedPostingCres != null && !pagedPostingCres.isEmpty()) {
+                cachedPostingCres.addAll(pagedPostingCres);
+                PostingCreWithDiffEtat.addAll(pagedPostingCres.stream()
+                        .filter(PostingCre -> !PostingCre.getEtat().equals("T"))
+                        .collect(Collectors.toList()));
+            }
+            Integer totalPages = (Integer) pagedResponse.get("totalPages");
+            hasMorePages = totalPages != null && page < totalPages - 1;
+            page++;
+            System.out.println("Total pages: " + totalPages + ", Has more pages: " + hasMorePages);
+            System.out.println("Cached PostingCres after page " + page + ": " + cachedPostingCres);
+            System.out.println("PostingCres with different etat after page " + page + ": " + PostingCreWithDiffEtat);
+        } while (hasMorePages);
+    }
+    public static void paginateAndCachePostingCresWithDiffEtat(PostingCreRequestDTO PostingCreRequest,
+                                                               PostingCreServiceImpl PostingCreServiceImpl,
+                                                               List<PostingCreDTO> PostingCreWithDiffEtat) {
+        int page = PostingCreRequest.getPage(); // Page requested
+        int size = PostingCreRequest.getSize(); // Page size
 
+        // Create a PageRequest with the current page and size
+        PageRequest pageRequest = PageRequest.of(page, size);
+
+        // Fetch paginated PostingCres with different states
+        Page<PostingCreDTO> pagedPostingCresWithDiffEtat = PostingCreServiceImpl.getPostingCresWithDifferentEtat(pageRequest);
+
+        // Clear the existing PostingCres
+        PostingCreWithDiffEtat.clear();
+
+        // Add the PostingCres of the current page to the list
+        if (pagedPostingCresWithDiffEtat != null && pagedPostingCresWithDiffEtat.hasContent()) {
+            PostingCreWithDiffEtat.addAll(pagedPostingCresWithDiffEtat.getContent());
+        }
+
+        // Log the results for debugging
+        System.out.println("Paginated PostingCres with different etat: " + PostingCreWithDiffEtat);
+        System.out.println("Total pages: " + (pagedPostingCresWithDiffEtat != null ? pagedPostingCresWithDiffEtat.getTotalPages() : 0));
+        System.out.println("Has more pages: " + (pagedPostingCresWithDiffEtat != null ? pagedPostingCresWithDiffEtat.hasNext() : false));
+    }
 }
 
 

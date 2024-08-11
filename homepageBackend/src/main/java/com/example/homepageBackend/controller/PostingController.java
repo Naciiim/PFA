@@ -1,13 +1,7 @@
 package com.example.homepageBackend.controller;
 
-import com.example.homepageBackend.model.dto.MouvementDTO;
-import com.example.homepageBackend.model.dto.MouvementRequestDTO;
-import com.example.homepageBackend.model.dto.PostingDTO;
-import com.example.homepageBackend.model.dto.PostingRequestDTO;
-import com.example.homepageBackend.service.ExportServiceImpl;
-import com.example.homepageBackend.service.HomePageServiceImpl;
-import com.example.homepageBackend.service.MouvementServiceImpl;
-import com.example.homepageBackend.service.PostingServiceImpl;
+import com.example.homepageBackend.model.dto.*;
+import com.example.homepageBackend.service.*;
 import com.example.homepageBackend.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,10 +26,14 @@ public class PostingController {
     @Autowired
     private PostingServiceImpl postingServiceImpl;
     @Autowired
+    private PostingCreServiceImpl postingCreServiceImpl;
+    @Autowired
     private MouvementServiceImpl mouvementServiceImpl;
 
     private final List<PostingDTO> cachedPostings = new ArrayList<>();
     private final List<PostingDTO> postingWithDiffEtat = new ArrayList<>();
+    private final List<PostingCreDTO> cachedPostingCres = new ArrayList<>();
+    private final List<PostingCreDTO> postingCreWithDiffEtat = new ArrayList<>();
     private final List<MouvementDTO> cachedMouvements = new ArrayList<>();
     private final List<MouvementDTO> mvtWithEtatDiff = new ArrayList<>();
     @Autowired
@@ -202,6 +200,86 @@ public class PostingController {
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
     }
+@PostMapping("/getPostingCre")
+    public ResponseEntity<Map<String, Object>> getPostingCre(@RequestBody PostingCreRequestDTO postingCreRequestDTO) {
 
+    System.out.println("Received DTO: " + postingCreRequestDTO);
 
+    // Get response from the service
+    Map<String, Object> response = homepageServiceImpl.findPostingCres(postingCreRequestDTO);
+
+    if (response == null) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+    }
+
+    // Get postings from the response, default to empty list if null
+    List<PostingCreDTO> postingCres = (List<PostingCreDTO>) response.get("postingCreSearched");
+    if (postingCres == null) {
+        postingCres = new ArrayList<>();
+    }
+
+    // Handle caching logic based on page number
+    if (postingCreRequestDTO.getPage() == 0) {
+        System.out.println("First page request, clearing cache...");
+
+        // Clear the cache for the first page request
+        cachedPostingCres.clear();
+        postingCreWithDiffEtat.clear();
+
+        // Add postings with different states to the list
+        List<PostingCreDTO> postingCresWithDiffEtat = (List<PostingCreDTO>) response.get("postingCreWithDiffEtat");
+        if (postingCresWithDiffEtat != null) {
+            postingCreWithDiffEtat.addAll(postingCresWithDiffEtat);
+        }
+
+        // Paginate postings and cache them
+        Utils.paginateAndCachePostingCres(postingCreRequestDTO, homepageServiceImpl, cachedPostingCres, postingCreWithDiffEtat);
+        Utils.paginateAndCachePostingCresWithDiffEtat(postingCreRequestDTO, postingCreServiceImpl, postingCreWithDiffEtat);
+    } else {
+        // Paginate postings with different states based on the current page
+        Utils.paginateAndCachePostingCresWithDiffEtat(postingCreRequestDTO, postingCreServiceImpl, postingCreWithDiffEtat);
+    }
+
+    System.out.println("Paginated postings with diff etat: " + postingCreWithDiffEtat);
+
+    response.put("postingCreWithDiffEtat", postingCreWithDiffEtat);
+    return ResponseEntity.ok(response);
 }
+    @GetMapping("/exportPostingCre")
+    public void exportPostingCres(HttpServletResponse response) {
+        try {
+            List<PostingCreDTO> postingCresToExport = new ArrayList<>();
+
+            if (!cachedPostingCres.isEmpty()) {
+                postingCresToExport.addAll(cachedPostingCres);
+            }else {
+                List<PostingCreDTO> allPostingCresWithDiffEtat = postingCreServiceImpl.getAllPostingCreWithDifferentEtat();
+                postingCresToExport.addAll(allPostingCresWithDiffEtat);
+            }
+
+            // Logging for debugging
+            System.out.println("Cached postingCres count: " + cachedPostingCres.size());
+            System.out.println("PostingCres with different state count: " + postingCreWithDiffEtat.size());
+            System.out.println("Total postingCres to export: " + postingCresToExport.size());
+
+            if (postingCresToExport.isEmpty()) {
+                response.setStatus(HttpStatus.NO_CONTENT.value());
+                response.getWriter().write("Aucun postingCre disponible pour l'exportation");
+                return;
+            }
+
+            response.setContentType("application/octet-stream");
+            response.setHeader("Content-Disposition", "attachment; filename=postingCres.xlsx");
+
+            try (OutputStream outputStream = response.getOutputStream()) {
+                exportServiceImpl.exportToExcel(postingCresToExport, outputStream);
+                outputStream.flush();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+    }
+}
+
+

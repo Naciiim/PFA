@@ -43,5 +43,5 @@ export interface Posting {
   userCode1: string;
   userCode2: string;
 
-  [key: string]: any;
+  [key: string]: any; //à verifier si tout marche bien
 }

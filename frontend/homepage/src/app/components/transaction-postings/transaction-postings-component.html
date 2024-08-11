@@ -13,18 +13,24 @@
   </button>
 </div>
   <div *ngIf="postings.length > 0" class="mt-4 relative">
-    <h2 class="text-lg font-bold mb-2 text-center">Transaction Postings</h2>
-   <div class="absolute top-3 right-10 flex space-x-4">
+    <h2 class="text-lg font-bold mb-10 text-center">Transaction Postings</h2>
+   <div class="absolute top-3 right-10 flex space-x-4 mt-6">
     <button (click)="exportToExcel()" class="relative float-right bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br text-white px-3 py-1 rounded hover:bg-green-600">
-      Export
+      Exporter les Postings
     </button>
       <button (click)="exportMouvementsToExcel()" class="relative float-right bg-gradient-to-r from-teal-400 via-teal-500 to-teal-600 hover:bg-gradient-to-br text-white px-3 py-1 rounded hover:bg-teal-600">
-        Export Mouvements
+        Exporter les Mouvements
       </button>
+     <button (click)="exportCresToExcel()" class="relative float-right bg-gradient-to-r from-cyan-400 via-cyan-500 to-cyan-600 hover:bg-gradient-to-br text-white px-3 py-1 rounded hover:bg-cyan-600">
+       Exporter les PostingCres
+     </button>
+     <button (click)="exportAllDataToExcel()" class="relative float-right bg-gradient-to-r from-lime-400 via-lime-500 to-lime-600 hover:bg-gradient-to-br text-white px-3 py-1 rounded hover:bg-lime-600">
+       Exporter Tous
+     </button>
   </div>
 
     <div>
-    <div class="shadow-lg rounded-lg overflow-x-auto mx-4 md:mx-10">
+    <div class="shadow-lg rounded-lg overflow-x-auto mx-4 md:mx-10 mt-8">
        <table class="min-w-full divide-y divide-gray-200">
           <thead>
           <tr class="bg-gray-100">

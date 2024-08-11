@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -23,4 +24,8 @@ public interface PostingRepository extends JpaRepository<Posting, PostingPK> {
   @Query("SELECT p.masterreference FROM Posting p WHERE p.id.transactionid = :transactionid")
 
   List<String> findMasterreferenceById_Transactionid(String transactionid,Pageable pageable);
+  @Query("select pc.id.transId from POSTINGCRE pc where substr(pc.id.transId,0,36) in (select distinct p.id.transactionid from Posting p where p.masterreference = :masterreference)")
+  List<String> findAllByMasterreference(@Param("masterreference") String masterreference, Pageable pageable);
+  @Query("select pc.id.transId from POSTINGCRE pc where substr(pc.id.transId,0,36) in (select distinct p.id.transactionid from Posting p where p.masterreference = :masterreference and p.eventreference=:eventreference)")
+  List<String> findAllByMasterreferenceAndEventreference(@Param("masterreference") String masterreference,@Param("eventreference") String eventreference, Pageable pageable);
 }

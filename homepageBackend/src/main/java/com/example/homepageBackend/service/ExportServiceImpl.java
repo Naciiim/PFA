@@ -1,6 +1,7 @@
 package com.example.homepageBackend.service;
 
 import com.example.homepageBackend.model.dto.MouvementDTO;
+import com.example.homepageBackend.model.dto.PostingCreDTO;
 import com.example.homepageBackend.model.dto.PostingDTO;
 import com.example.homepageBackend.util.DatabaseUtils;
 import com.example.homepageBackend.util.Utils;
@@ -40,7 +41,12 @@ public class ExportServiceImpl implements ExportService {
                 columnNames = DatabaseUtils.getDatabaseColumnNames("MOUVEMENT");
                 sheetName = "Mouvements";
             }
-        } else {
+        }else if(firstItem instanceof PostingCreDTO) {
+            columnNames = DatabaseUtils.getDatabaseColumnNames("POSTINGCRE");
+            sheetName = "PostingCre";
+        }
+
+        else {
             throw new IllegalArgumentException("Type de données non supporté");
         }
 
@@ -68,8 +74,14 @@ public class ExportServiceImpl implements ExportService {
 
             // Créer les styles pour les dates
             CellStyle dateCellStyle = workbook.createCellStyle();
-            CreationHelper createHelper = workbook.getCreationHelper();
-            dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("yyyy-MM-dd"));
+            if (firstItem instanceof PostingCreDTO) {
+                CreationHelper createHelper = workbook.getCreationHelper();
+                dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("yyyy-MM-dd HH:mm:ss"));
+            } else {
+
+                CreationHelper createHelper = workbook.getCreationHelper();
+                dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("yyyy-MM-dd"));
+            }
 
             // Créer les lignes de données
             int rowIdx = 1;
