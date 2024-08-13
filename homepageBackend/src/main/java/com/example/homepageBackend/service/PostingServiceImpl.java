@@ -1,10 +1,8 @@
 package com.example.homepageBackend.service;
 
 import com.example.homepageBackend.model.dto.PostingDTO;
-import com.example.homepageBackend.model.mapper.MouvementMapper;
 import com.example.homepageBackend.model.mapper.PostingMapper;
-import com.example.homepageBackend.repository.MouvementRepository;
-import com.example.homepageBackend.repository.MouvementTrfRepository;
+
 import com.example.homepageBackend.repository.PostingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,13 +21,7 @@ public class PostingServiceImpl implements PostingService {
 
     @Autowired
     private PostingMapper postingMapper;
-    @Autowired
-    private MouvementRepository mouvementRepository;
 
-    @Autowired
-    private MouvementTrfRepository mouvementTrfRepository;
-    @Autowired
-    private MouvementMapper mouvementMapper;
 
     @Override
     public Page<PostingDTO> getPostingsByTransactionId(String transactionid, Pageable pageable) {

@@ -7,8 +7,7 @@ import com.example.homepageBackend.model.mapper.MouvementMapper;
 import com.example.homepageBackend.repository.MouvementRepository;
 import com.example.homepageBackend.repository.MouvementTrfRepository;
 import com.example.homepageBackend.repository.PostingRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -17,7 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -34,7 +32,6 @@ public class MouvementServiceImpl implements MouvementService {
 
     @Autowired
     private MouvementMapper mouvementMapper;
-    private static final Logger logger = LoggerFactory.getLogger(MouvementServiceImpl.class);
 
 
     @Override
