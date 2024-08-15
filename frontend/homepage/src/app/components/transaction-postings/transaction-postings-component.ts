@@ -245,6 +245,26 @@ export class TransactionPostingsComponent {
       this.errorMessage = 'Aucun posting disponible pour effectuer la recherche.';
     }
   }
+  onSelectExportOption(event: any) {
+    const selectedValue = event.target.value;
+
+    switch (selectedValue) {
+      case 'exportPostings':
+        this.exportToExcel();
+        break;
+      case 'exportMouvements':
+        this.exportMouvementsToExcel();
+        break;
+      case 'exportCres':
+        this.exportCresToExcel();
+        break;
+      case 'exportAll':
+        this.exportAllDataToExcel();
+        break;
+      default:
+        break;
+    }
+  }
 
   dismissError() {
     this.errorMessage = '';

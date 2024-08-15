@@ -4,11 +4,11 @@ import { Posting } from '../../models/posting.model';
 import { ExportService } from '../../services/export.service';
 
 @Component({
-  selector: 'app-homepage-front',
-  templateUrl: './homepage-front.component.html',
-  styleUrls: ['./homepage-front.component.css']
+  selector: 'app-postings',
+  templateUrl: './postings.component.html',
+  styleUrls: ['./postings.component.css']
 })
-export class HomepageFrontComponent implements OnInit {
+export class PostingsComponent implements OnInit {
   transactionid: string = '';
   masterreference: string = '';
   eventreference: string = '';

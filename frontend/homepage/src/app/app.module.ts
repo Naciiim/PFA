@@ -9,7 +9,6 @@ import { MatIconModule } from '@angular/material/icon';
 import {ExportService} from "./services/export.service";
 import {PostingService} from "./services/posting.service";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import {HomepageFrontComponent} from "./components/homepage-front/homepage-front.component";
 import {DefaultPostingsComponent} from "./components/default-postings/default-postings-component";
 import {TransactionPostingsComponent} from "./components/transaction-postings/transaction-postings-component";
 import {PostingDetailsComponent} from "./components/posting-details/posting-details.component";
@@ -23,13 +22,14 @@ import { DefaultPostingcreComponent } from './components/default-postingcre/defa
 import { PostingcreDetailsComponent } from './components/postingcre-details/postingcre-details.component';
 import { PostingcreComponent } from './components/postingcre/postingcre.component';
 import { TransactionPostingcreComponent } from './components/transaction-postingcre/transaction-postingcre.component';
+import {PostingsComponent} from "./components/postings/postings.component";
 
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    HomepageFrontComponent,
+    PostingsComponent,
     DefaultPostingsComponent,
     TransactionPostingsComponent,
     PostingDetailsComponent,

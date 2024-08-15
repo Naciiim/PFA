@@ -6,18 +6,26 @@
     </svg>
   </button>
   <h2 class="text-lg font-bold mb-2 text-center">Informations Détaillées</h2>
-  <div class="shadow-lg rounded-lg overflow-x-auto mx-4 md:mx-10 mb-4 mt-4">
+  <div class="shadow-lg rounded-lg overflow-x-auto mx-4 md:mx-10 max-h-96 overflow-y-auto">
     <table class="min-w-full divide-y divide-gray-200">
-      <thead>
-      <tr class="bg-gray-100">
-        <th class="whitespace-nowrap py-4 px-6 text-center text-gray-600 font-bold uppercase">Transaction ID</th>
-        <th class="whitespace-nowrap py-4 px-6 text-center text-gray-600 font-bold uppercase">Chaine cre</th>
-
-      </thead>
       <tbody class="bg-white">
       <tr class="border-b border-gray-200">
-        <td class="whitespace-nowrap py-4 px-6 text-center">{{ data.transId }}</td>
+        <th class="whitespace-nowrap bg-gray-100 py-4 px-6 text-left text-gray-600 font-bold uppercase">Transaction ID</th>
+        <td class="whitespace-nowrap py-4 px-6">{{ data.transId }}</td>
+      </tr>
+      <tr class="border-b border-gray-200">
+        <th class="whitespace-nowrap bg-gray-100 py-4 px-6 text-left text-gray-600 font-bold uppercase">Chaine cre</th>
         <td class="whitespace-nowrap py-4 px-6 text-center">{{ data.chaineCre }}</td>
+      </tr>
+      <tr>
+        <th class="whitespace-nowrap bg-gray-100 py-4 px-6 text-left text-gray-600 font-bold uppercase">Etat</th>
+        <td class="whitespace-nowrap py-4 px-6 ">
+            <span [ngClass]="{
+              'text-green-500': data.etat === 'O',
+              'text-red-500': data.etat === 'M',
+              'text-yellow-500': data.etat === 'N'
+            }">{{ data.etat }}</span>
+        </td>
       </tr>
       </tbody>
     </table>
