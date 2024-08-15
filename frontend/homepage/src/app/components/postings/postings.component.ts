@@ -17,6 +17,7 @@ export class PostingsComponent implements OnInit {
   transactionPostings: Posting[] = [];
   backendErrorMessage: string = '';
   errorMessage: string = '';
+  showError: boolean = false;
   currentPage: number = 1;
   totalPages: number = 1;
   totalPagesWithDiffEtat: number = 1;
@@ -42,7 +43,8 @@ export class PostingsComponent implements OnInit {
           if (response.postingWithDiffEtat && response.postingWithDiffEtat.length > 0) {
             this.defaultPostings = response.postingWithDiffEtat;
             this.totalPagesWithDiffEtat = response.totalPagesWithDiffEtat || 1;
-            this.backendErrorMessage = ''; // Réinitialiser le message d'erreur en cas de succès
+            this.backendErrorMessage = '';
+            this.showError=false;
           } else {
             this.defaultPostings = [];
             this.totalPagesWithDiffEtat = 1;
@@ -73,18 +75,22 @@ export class PostingsComponent implements OnInit {
           if (response.POSTINGSEARCHED && response.POSTINGSEARCHED.length > 0) {
             this.transactionPostings = response.POSTINGSEARCHED;
             this.totalPages = response.totalPages || 1;
-            this.backendErrorMessage = ''; // Réinitialiser le message d'erreur en cas de succès
+            this.backendErrorMessage = '';
+            this.showError = false;
+
           } else {
             this.transactionPostings = [];
             this.totalPages = 1;
             this.backendErrorMessage = response.message || 'Aucun posting trouvé.';
+            this.showError = true;
           }
         }
       },
       error => {
         console.error('Erreur lors de la récupération des postings :', error);
         this.errorMessage = 'Une erreur est survenue lors de la récupération des postings';
-        this.backendErrorMessage = error.message || 'Une erreur inconnue est survenue'; // Réinitialiser le message d'erreur en cas de problème avec l'API
+        this.backendErrorMessage = error.message || 'Une erreur inconnue est survenue';
+        this.showError = true;
       }
     );
   }
@@ -92,11 +98,12 @@ export class PostingsComponent implements OnInit {
 
   searchPostings() {
     if (!this.transactionid && !this.masterreference) {
-      this.errorMessage = 'L\'ID de transaction ou la référence maître est requise';
+      this.errorMessage = 'Transaction ID et Master Reference ne peuvent pas être tous les deux vides.';
+      this.showError = true;
       return;
     }
 
-    this.currentPage = 1; // Réinitialiser à la première page lors de la nouvelle recherche
+    this.currentPage = 1;
     this.loadPostings();
   }
 
@@ -153,6 +160,7 @@ export class PostingsComponent implements OnInit {
 
   dismissError() {
     this.errorMessage = '';
+    this.showError = false;
     this.transactionid = '';
     this.masterreference = '';
     this.eventreference = '';

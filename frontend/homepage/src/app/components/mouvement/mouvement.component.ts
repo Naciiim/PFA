@@ -18,6 +18,7 @@ export class MouvementComponent implements OnInit {
   searchedMouvements: Mouvement[] = [];
   noMouvements: Mouvement[] = [];
   errorMessage: string = '';
+  showError: boolean = false;
   currentPage: number = 1;
   totalPages: number = 1;
   totalPagesWithDiffEtat: number = 1;
@@ -48,11 +49,13 @@ export class MouvementComponent implements OnInit {
           if (response.mvtWithEtatDiff && response.mvtWithEtatDiff.length > 0) {
             this.defaultMouvements = response.mvtWithEtatDiff;
             this.totalPagesWithDiffEtat = response.totalPagesWithEtatDiff || 1;
-            this.errorMessage = ''; // Réinitialiser le message d'erreur en cas de succès
+            this.errorMessage = '';
+            this.showError = false;
           } else {
             this.defaultMouvements = [];
             this.totalPagesWithDiffEtat = 1;
             this.errorMessage = response.message || 'Aucun mouvement trouvé avec état différent.';
+
           }
         }
       },
@@ -78,24 +81,28 @@ export class MouvementComponent implements OnInit {
           if (response.mvtSearched && response.mvtSearched.length > 0) {
             this.searchedMouvements = response.mvtSearched;
             this.totalPages = response.totalPages || 1;
-            this.errorMessage = ''; // Réinitialiser le message d'erreur en cas de succès
+            this.errorMessage = '';
+            this.showError = false;
           } else {
             this.searchedMouvements = [];
             this.totalPages = 1;
             this.errorMessage = response.message || 'Aucun mouvement trouvé.';
+            this.showError = true;
           }
         }
       },
       error => {
         console.error('Erreur lors de la récupération des mouvements recherchés:', error);
         this.errorMessage = 'Une erreur est survenue lors de la récupération des mouvements';
+        this.showError = true;
       }
     );
   }
 
   searchMouvements() {
     if (!this.transactionid && !this.reference) {
-      this.errorMessage = "L'ID de transaction ou la référence est requise";
+      this.errorMessage = "Transaction ID et Master Reference ne peuvent pas être tous les deux vides.";
+      this.showError = true;
       return;
     }
 
@@ -155,6 +162,7 @@ export class MouvementComponent implements OnInit {
 
   dismissError() {
     this.errorMessage = '';
+    this.showError = false;
     this.transactionid = '';
     this.reference = '';
     this.eventreference = '';
