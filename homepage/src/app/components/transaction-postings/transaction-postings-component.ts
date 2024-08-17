@@ -31,8 +31,12 @@ export class TransactionPostingsComponent {
         const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
+        const temps=new Date();
+        const jour=temps.toLocaleDateString('fr-FR').replace(/\//g, '-');
+        const heure=temps.toTimeString().slice(0, 8).replace(/:/g, '-');
+        const date=`${jour} at ${heure}`
         a.href = url;
-        a.download = 'PostingSearched.xlsx';
+        a.download = `Postings_${date}.xlsx`;
         a.click();
         window.URL.revokeObjectURL(url);
       },
@@ -64,8 +68,12 @@ export class TransactionPostingsComponent {
                 const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
+                const temps=new Date();
+                const jour=temps.toLocaleDateString('fr-FR').replace(/\//g, '-');
+                const heure=temps.toTimeString().slice(0, 8).replace(/:/g, '-');
+                const date=`${jour} at ${heure}`
                 a.href = url;
-                a.download = 'Mouvements.xlsx';
+                a.download = `Mouvements_${date}.xlsx`;
                 a.click();
                 window.URL.revokeObjectURL(url);
               },
@@ -107,8 +115,12 @@ export class TransactionPostingsComponent {
                 const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
+                const temps=new Date();
+                const jour=temps.toLocaleDateString('fr-FR').replace(/\//g, '-');
+                const heure=temps.toTimeString().slice(0, 8).replace(/:/g, '-');
+                const date=`${jour} at ${heure}`
                 a.href = url;
-                a.download = 'PostingCres.xlsx';
+                a.download = `Cres_${date}.xlsx`;
                 a.click();
                 window.URL.revokeObjectURL(url);
               },
@@ -209,25 +221,29 @@ export class TransactionPostingsComponent {
               const arrayBuffer = reader.result as ArrayBuffer;
               const wb = XLSX.read(arrayBuffer, { type: 'array' });
               const postingSheet = wb.Sheets[wb.SheetNames[0]];
-              XLSX.utils.book_append_sheet(workbook, postingSheet, 'PostingSearched');
+              XLSX.utils.book_append_sheet(workbook, postingSheet, 'Postings');
 
               // Ajouter la feuille MvtSearched à partir des données JSON
               const mvtDataArray = Array.isArray(mouvementData) ? mouvementData : [];
               const mvtSheet = XLSX.utils.json_to_sheet(mvtDataArray);
-              XLSX.utils.book_append_sheet(workbook, mvtSheet, 'MvtSearched');
+              XLSX.utils.book_append_sheet(workbook, mvtSheet, 'Mouvements');
 
               // Ajouter la feuille PostingCreSearched à partir des données JSON
               const creDataArray = Array.isArray(creData) ? creData : [];
               const creSheet = XLSX.utils.json_to_sheet(creDataArray);
-              XLSX.utils.book_append_sheet(workbook, creSheet, 'PostingCreSearched');
+              XLSX.utils.book_append_sheet(workbook, creSheet, 'Cres');
 
               // Générer le fichier Excel et le télécharger
               const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
               const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
               const url = window.URL.createObjectURL(blob);
               const a = document.createElement('a');
+              const temps=new Date();
+              const jour=temps.toLocaleDateString('fr-FR').replace(/\//g, '-');
+              const heure=temps.toTimeString().slice(0, 8).replace(/:/g, '-');
+              const date=`${jour}_${heure}`
               a.href = url;
-              a.download = 'AllData.xlsx';
+              a.download = `Export_${date}.xlsx`;
               a.click();
               window.URL.revokeObjectURL(url);
             };

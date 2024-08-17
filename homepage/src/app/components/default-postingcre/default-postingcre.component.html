@@ -1,5 +1,5 @@
 <div class="mt-4 relative" *ngIf="postingCres.length > 0; else noPostings">
-  <h2 class="text-lg font-bold mb-2 text-center">Postings Instanciés</h2>
+  <h2 class="text-lg font-bold mb-2 text-center">Cres en instance</h2>
   <div class="absolute top-3 right-10">
     <button (click)="exportToExcel()" class="relative float-right bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br text-white px-3 py-1 rounded hover:bg-green-600">
       Export
@@ -38,11 +38,10 @@
 </div>
 
 <ng-template #noPostings>
-  <div class="flex flex-col items-center border border-gray-200 rounded-lg shadow md:flex-row md:max-w-xl  dark:bg-gray-800 mx-auto mt-20 ">
-    <img class="object-cover w-full h-96 md:h-auto md:w-48 rounded-t-lg md:rounded-none md:rounded-l-lg" src="assets/image_boa.jpg" alt="Test Image">
-    <div class="flex flex-col justify-between leading-normal p-4">
-      <span class="mb-2 text-xl font-bold italic tracking-tight text-gray-900 dark:text-white">Aucun CRE instancié</span>
-      <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Cherchez les postingCres dont vous avez besoin!</p>
-    </div>
+  <div id="alert-2" class="flex items-center p-4 mb-4 text-yellow-800 rounded-lg bg-yellow-50" role="alert">
+    <svg class="flex-shrink-0 w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+      <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+    </svg>
+    <span>Aucun Cre en instance</span>
   </div>
 </ng-template>

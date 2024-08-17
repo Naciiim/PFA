@@ -19,8 +19,12 @@ export class TransactionPostingcreComponent {
         const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
+        const temps=new Date();
+        const jour=temps.toLocaleDateString('fr-FR').replace(/\//g, '-');
+        const heure=temps.toTimeString().slice(0, 8).replace(/:/g, '-');
+        const date=`${jour} at ${heure}`
         a.href = url;
-        a.download = 'PostingCre.xlsx';
+        a.download = `Cres_${date}.xlsx`;
         a.click();
         window.URL.revokeObjectURL(url);
       },

@@ -1,11 +1,11 @@
-<div *ngIf="errorMessage" id="alert-border-2" class="flex items-center p-4 mb-4 text-red-800 border-t-4 border-red-300 bg-red-50 dark:text-red-400 dark:bg-gray-800 dark:border-red-800" role="alert">
+<div *ngIf="errorMessage" id="alert-2" class="flex items-center p-4 mb-4 text-red-800 border-t-4 border-red-300 bg-red-50" role="alert">
   <svg class="flex-shrink-0 w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
     <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
   </svg>
   <div class="ms-3 text-sm font-medium">
     {{ errorMessage }}
   </div>
-  <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-red-50 text-red-500 rounded-lg focus:ring-2 focus:ring-red-400 p-1.5 hover:bg-red-200 inline-flex items-center justify-center h-8 w-8 dark:bg-gray-800 dark:text-red-400 dark:hover:bg-gray-700" (click)="dismissError()">
+  <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-red-50 text-red-500 rounded-lg focus:ring-2 focus:ring-red-400 p-1.5 hover:bg-red-200 inline-flex items-center justify-center h-8 w-8" (click)="dismissError()">
     <span class="sr-only">Dismiss</span>
     <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
       <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
@@ -14,17 +14,18 @@
 </div>
   <div *ngIf="postings.length > 0" class="mt-4 relative">
     <h2 class="text-lg font-bold mb-10 text-center">Liste des Postings</h2>
-   <div class="absolute top-3 right-10 flex space-x-4 mt-2">
-     <form class="flex items-center">
-       <select id="exportOptions" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" (change)="onSelectExportOption($event)">
-         <option selected disabled>Exporter les données</option>
-         <option value="exportPostings">Exporter les Postings</option>
-         <option value="exportMouvements">Exporter les Mouvements</option>
-         <option value="exportCres">Exporter les PostingCres</option>
-         <option value="exportAll">Exporter Tous</option>
-       </select>
-     </form>
-  </div>
+    <div class="absolute top-3 right-10 flex space-x-4 mt-2">
+      <form class="flex items-center">
+        <select id="exportOptions" class="bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br text-white border-transparent text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5" (change)="onSelectExportOption($event)">
+          <option selected disabled class="bg-green-600 text-gray-400">Exporter les données</option>
+          <option value="exportPostings" class="bg-green-600">Exporter les Postings</option>
+          <option value="exportMouvements" class="bg-green-600">Exporter les Mouvements</option>
+          <option value="exportCres" class="bg-green-600">Exporter les Cres</option>
+          <option value="exportAll" class="bg-green-600 ">Exporter Tous</option>
+        </select>
+      </form>
+    </div>
+
 
     <div>
     <div class="shadow-lg rounded-lg overflow-x-auto mx-4 md:mx-10 mt-8">
@@ -33,7 +34,7 @@
           <tr class="bg-gray-100">
             <th class=" whitespace-nowrap py-4 px-6 text-center text-gray-600 font-bold uppercase">Transaction ID</th>
             <th class=" whitespace-nowrap py-4 px-6 text-center text-gray-600 font-bold uppercase">Transaction Seq No</th>
-            <th class=" whitespace-nowrap py-4 px-6 text-center text-gray-600 font-bold uppercase">Bank Account Seq No</th>
+            <th class=" whitespace-nowrap py-4 px-6 text-center text-gray-600 font-bold uppercase">Account</th>
             <th class=" whitespace-nowrap py-4 px-6 text-center text-gray-600 font-bold uppercase">Account Type</th>
             <th class=" whitespace-nowrap py-4 px-6 text-center text-gray-600 font-bold uppercase">Etat</th>
           </tr>

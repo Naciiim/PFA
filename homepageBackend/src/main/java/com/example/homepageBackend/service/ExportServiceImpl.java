@@ -13,6 +13,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 
@@ -41,12 +45,10 @@ public class ExportServiceImpl implements ExportService {
                 columnNames = DatabaseUtils.getDatabaseColumnNames("MOUVEMENT");
                 sheetName = "Mouvements";
             }
-        }else if(firstItem instanceof PostingCreDTO) {
+        } else if (firstItem instanceof PostingCreDTO) {
             columnNames = DatabaseUtils.getDatabaseColumnNames("POSTINGCRE");
             sheetName = "PostingCre";
-        }
-
-        else {
+        } else {
             throw new IllegalArgumentException("Type de données non supporté");
         }
 
@@ -56,7 +58,6 @@ public class ExportServiceImpl implements ExportService {
 
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet(sheetName);
-
 
             // Créer la ligne d'en-tête dynamiquement
             Row headerRow = sheet.createRow(0);
@@ -73,15 +74,11 @@ public class ExportServiceImpl implements ExportService {
             }
 
             // Créer les styles pour les dates
-            CellStyle dateCellStyle = workbook.createCellStyle();
-            if (firstItem instanceof PostingCreDTO) {
-                CreationHelper createHelper = workbook.getCreationHelper();
-                dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("yyyy-MM-dd HH:mm:ss"));
-            } else {
-
-                CreationHelper createHelper = workbook.getCreationHelper();
-                dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("yyyy-MM-dd"));
-            }
+            CreationHelper createHelper = workbook.getCreationHelper();
+            CellStyle dateCellStyleWithTime = workbook.createCellStyle();
+            CellStyle dateCellStyleWithoutTime = workbook.createCellStyle();
+            dateCellStyleWithTime.setDataFormat(createHelper.createDataFormat().getFormat("yyyy-MM-dd HH:mm:ss"));
+            dateCellStyleWithoutTime.setDataFormat(createHelper.createDataFormat().getFormat("yyyy-MM-dd"));
 
             // Créer les lignes de données
             int rowIdx = 1;
@@ -100,8 +97,17 @@ public class ExportServiceImpl implements ExportService {
                             Cell cell = row.createCell(i);
                             if (value != null) {
                                 if (value instanceof Date) {
-                                    cell.setCellValue((Date) value);
-                                    cell.setCellStyle(dateCellStyle);
+                                    if (dataItem instanceof PostingCreDTO) {
+                                        // Convertir la date en UTC pour PostingCreDTO
+                                        Instant instant = ((Date) value).toInstant();
+                                        ZonedDateTime utcDateTime = instant.atZone(ZoneId.of("UTC"));
+                                        String formattedDate = utcDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                                        cell.setCellValue(formattedDate);
+                                        cell.setCellStyle(dateCellStyleWithTime);
+                                    } else {
+                                        cell.setCellValue((Date) value);
+                                        cell.setCellStyle(dateCellStyleWithoutTime);
+                                    }
                                 } else if (value instanceof Number) {
                                     cell.setCellValue(((Number) value).doubleValue());
                                 } else {
