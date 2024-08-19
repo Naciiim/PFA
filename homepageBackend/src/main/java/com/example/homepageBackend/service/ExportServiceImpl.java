@@ -47,7 +47,7 @@ public class ExportServiceImpl implements ExportService {
             }
         } else if (firstItem instanceof PostingCreDTO) {
             columnNames = DatabaseUtils.getDatabaseColumnNames("POSTINGCRE");
-            sheetName = "PostingCre";
+            sheetName = "Cres";
         } else {
             throw new IllegalArgumentException("Type de données non supporté");
         }
