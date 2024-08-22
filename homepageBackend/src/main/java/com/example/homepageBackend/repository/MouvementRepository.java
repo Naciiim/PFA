@@ -2,7 +2,6 @@ package com.example.homepageBackend.repository;
 
 import com.example.homepageBackend.model.entity.Mouvement;
 import com.example.homepageBackend.model.entity.MouvementPK;
-import com.example.homepageBackend.model.entity.Posting;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

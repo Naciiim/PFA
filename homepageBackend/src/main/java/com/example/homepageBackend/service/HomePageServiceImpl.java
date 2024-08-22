@@ -1,25 +1,22 @@
 package com.example.homepageBackend.service;
 
 import com.example.homepageBackend.model.dto.*;
-import com.example.homepageBackend.model.entity.Mouvement;
-import com.example.homepageBackend.model.entity.MouvementTrf;
+
 import com.example.homepageBackend.model.mapper.MouvementMapper;
 import com.example.homepageBackend.repository.MouvementRepository;
 import com.example.homepageBackend.repository.MouvementTrfRepository;
-import com.example.homepageBackend.repository.PostingCreRepository;
 import com.example.homepageBackend.util.FileHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Profile(value = {"DEV", "PROD", "REC"})
@@ -37,8 +34,7 @@ public class HomePageServiceImpl implements HomePageService {
     private MouvementTrfRepository mouvementTrfRepository;
     @Autowired
     private MouvementMapper mouvementMapper;
-    @Autowired
-    private PostingCreRepository postingCreRepository;
+
     @Autowired
     private PostingCreServiceImpl postingCreServiceImpl;
 

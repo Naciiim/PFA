@@ -102,12 +102,12 @@ public class PostingCreServiceImpl implements PostingCreService {
     public List<PostingCreDTO> getAllPostingCreWithDifferentEtat() {
         List<PostingCreDTO> allPostings = new ArrayList<>();
         int pageNumber = 0;
-        int pageSize = 10; // Adjust page size as needed
+        int pageSize = 10;
         Page<PostingCreDTO> page;
 
         do {
             Pageable pageable = PageRequest.of(pageNumber, pageSize);
-            page = postingCreRepository.findByEtatNot("T", pageable).map(postingCreMapper::toDto);
+            page = postingCreRepository.findByEtatNot("O", pageable).map(postingCreMapper::toDto);
             allPostings.addAll(page.getContent());
             pageNumber++;
         } while (page.hasNext());

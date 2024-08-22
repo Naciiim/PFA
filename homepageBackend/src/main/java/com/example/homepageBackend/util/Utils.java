@@ -2,7 +2,6 @@ package com.example.homepageBackend.util;
 
 import com.example.homepageBackend.model.dto.*;
 import com.example.homepageBackend.service.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
@@ -13,9 +12,6 @@ import java.util.stream.Collectors;
 
 @Component
 public class Utils {
-
-    @Autowired
-    private ExportServiceImpl exportServiceImpl;
 
     public static Method findGetterMethod(Object object, String fieldName) {
         String getterMethodName = "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
@@ -78,24 +74,24 @@ public class Utils {
     public static void paginateAndCachePostingsWithDiffEtat(PostingRequestDTO postingRequest,
                                                             PostingServiceImpl postingServiceImpl,
                                                             List<PostingDTO> postingWithDiffEtat) {
-        int page = postingRequest.getPage(); // Page requested
-        int size = postingRequest.getSize(); // Page size
+        int page = postingRequest.getPage();
+        int size = postingRequest.getSize();
 
-        // Create a PageRequest with the current page and size
+
         PageRequest pageRequest = PageRequest.of(page, size);
 
-        // Fetch paginated postings with different states
+
         Page<PostingDTO> pagedPostingsWithDiffEtat = postingServiceImpl.getPostingsWithDifferentEtat(pageRequest);
 
-        // Clear the existing postings
+
         postingWithDiffEtat.clear();
 
-        // Add the postings of the current page to the list
+
         if (pagedPostingsWithDiffEtat != null && pagedPostingsWithDiffEtat.hasContent()) {
             postingWithDiffEtat.addAll(pagedPostingsWithDiffEtat.getContent());
         }
 
-        // Log the results for debugging
+
         System.out.println("Paginated postings with different etat: " + postingWithDiffEtat);
         System.out.println("Total pages: " + (pagedPostingsWithDiffEtat != null ? pagedPostingsWithDiffEtat.getTotalPages() : 0));
         System.out.println("Has more pages: " + (pagedPostingsWithDiffEtat != null ? pagedPostingsWithDiffEtat.hasNext() : false));
@@ -133,25 +129,20 @@ public class Utils {
     public static void paginateAndCacheMouvementsWithDiffEtat(MouvementRequestDTO mouvementRequest,
                                                               MouvementServiceImpl mouvementServiceImpl,
                                                               List<MouvementDTO> mouvementWithDiffEtat) {
-        int page = mouvementRequest.getPage(); // Page requested
-        int size = mouvementRequest.getSize(); // Page size
+        int page = mouvementRequest.getPage();
+        int size = mouvementRequest.getSize();
 
-        // Create a PageRequest with the current page and size
         PageRequest pageRequest = PageRequest.of(page, size);
 
-        // Fetch paginated mouvements with different states
         Page<MouvementDTO> pagedMouvementsWithDiffEtat = mouvementServiceImpl.getMouvementsWithDifferentEtat(pageRequest);
 
-        // Clear the existing mouvements
         mouvementWithDiffEtat.clear();
 
-        // Add the mouvements of the current page to the list
         if (pagedMouvementsWithDiffEtat != null && pagedMouvementsWithDiffEtat.hasContent()) {
             mouvementWithDiffEtat.addAll(pagedMouvementsWithDiffEtat.getContent());
         }
         int totalPages = pagedMouvementsWithDiffEtat != null ? pagedMouvementsWithDiffEtat.getTotalPages() : 0;
         boolean hasNextPage = pagedMouvementsWithDiffEtat != null && pagedMouvementsWithDiffEtat.hasNext();
-        // Log the results for debugging
         System.out.println("Paginated mouvements with different etat: " + mouvementWithDiffEtat);
         System.out.println("Total pages: " + totalPages);
         System.out.println("Has more pages: " + hasNextPage);
@@ -169,11 +160,11 @@ public class Utils {
             if (pagedResponse == null) {
                 break;
             }
-            List<PostingCreDTO> pagedPostingCres = (List<PostingCreDTO>) pagedResponse.get("PostingCreSEARCHED");
+            List<PostingCreDTO> pagedPostingCres = (List<PostingCreDTO>) pagedResponse.get("postingCreSearched");
             if (pagedPostingCres != null && !pagedPostingCres.isEmpty()) {
                 cachedPostingCres.addAll(pagedPostingCres);
                 PostingCreWithDiffEtat.addAll(pagedPostingCres.stream()
-                        .filter(PostingCre -> !PostingCre.getEtat().equals("T"))
+                        .filter(PostingCre -> !PostingCre.getEtat().equals("O"))
                         .collect(Collectors.toList()));
             }
             Integer totalPages = (Integer) pagedResponse.get("totalPages");
@@ -187,24 +178,19 @@ public class Utils {
     public static void paginateAndCachePostingCresWithDiffEtat(PostingCreRequestDTO PostingCreRequest,
                                                                PostingCreServiceImpl PostingCreServiceImpl,
                                                                List<PostingCreDTO> PostingCreWithDiffEtat) {
-        int page = PostingCreRequest.getPage(); // Page requested
-        int size = PostingCreRequest.getSize(); // Page size
+        int page = PostingCreRequest.getPage();
+        int size = PostingCreRequest.getSize();
 
-        // Create a PageRequest with the current page and size
         PageRequest pageRequest = PageRequest.of(page, size);
 
-        // Fetch paginated PostingCres with different states
         Page<PostingCreDTO> pagedPostingCresWithDiffEtat = PostingCreServiceImpl.getPostingCresWithDifferentEtat(pageRequest);
 
-        // Clear the existing PostingCres
         PostingCreWithDiffEtat.clear();
 
-        // Add the PostingCres of the current page to the list
         if (pagedPostingCresWithDiffEtat != null && pagedPostingCresWithDiffEtat.hasContent()) {
             PostingCreWithDiffEtat.addAll(pagedPostingCresWithDiffEtat.getContent());
         }
 
-        // Log the results for debugging
         System.out.println("Paginated PostingCres with different etat: " + PostingCreWithDiffEtat);
         System.out.println("Total pages: " + (pagedPostingCresWithDiffEtat != null ? pagedPostingCresWithDiffEtat.getTotalPages() : 0));
         System.out.println("Has more pages: " + (pagedPostingCresWithDiffEtat != null ? pagedPostingCresWithDiffEtat.hasNext() : false));

@@ -3,7 +3,6 @@ package com.example.homepageBackend.service;
 import com.example.homepageBackend.model.dto.MouvementRequestDTO;
 import com.example.homepageBackend.model.dto.PostingCreRequestDTO;
 import com.example.homepageBackend.model.dto.PostingRequestDTO;
-import org.springframework.data.domain.Pageable;
 
 import java.util.Map;
 

@@ -1,8 +1,6 @@
 package com.example.homepageBackend.service;
 
 import com.example.homepageBackend.model.dto.MouvementDTO;
-import com.example.homepageBackend.model.dto.MouvementRequestDTO;
-import com.example.homepageBackend.model.dto.PostingDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -16,7 +14,7 @@ public interface MouvementService {
     Page<MouvementDTO> searchMouvementByTransactionIdAndReferenceAndEventReference(String transactionid, String reference, String eventreference, Pageable pageable);
     Page<MouvementDTO> searchMouvementByReferenceAndEventReference(String reference, String eventreference, Pageable pageable);
     Page<MouvementDTO> searchMouvementByTransactionIdAndEventReference(String transactionid, String eventreference, Pageable pageable);
-//     Page<MouvementDTO> getMouvementTrfWithDifferentEtat( Pageable pageable) ;
+
 
     List<MouvementDTO> getAllMouvementsWithDifferentEtat();
 }

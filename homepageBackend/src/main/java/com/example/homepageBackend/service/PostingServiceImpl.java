@@ -62,7 +62,7 @@ public class PostingServiceImpl implements PostingService {
     public List<PostingDTO> getAllPostingsWithDifferentEtat() {
         List<PostingDTO> allPostings = new ArrayList<>();
         int pageNumber = 0;
-        int pageSize = 10; // Adjust page size as needed
+        int pageSize = 10;
         Page<PostingDTO> page;
 
         do {

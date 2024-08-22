@@ -43,38 +43,31 @@ public class PostingController {
     public ResponseEntity<Map<String, Object>> getPostings(@RequestBody PostingRequestDTO postingRequest) {
         System.out.println("Received DTO: " + postingRequest);
 
-        // Get response from the service
         Map<String, Object> response = homepageServiceImpl.findPostings(postingRequest);
 
         if (response == null) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
 
-        // Get postings from the response, default to empty list if null
         List<PostingDTO> postings = (List<PostingDTO>) response.get("POSTINGSEARCHED");
         if (postings == null) {
             postings = new ArrayList<>();
         }
 
-        // Handle caching logic based on page number
         if (postingRequest.getPage() == 0) {
             System.out.println("First page request, clearing cache...");
 
-            // Clear the cache for the first page request
             cachedPostings.clear();
             postingWithDiffEtat.clear();
 
-            // Add postings with different states to the list
             List<PostingDTO> postingsWithDiffEtat = (List<PostingDTO>) response.get("postingWithDiffEtat");
             if (postingsWithDiffEtat != null) {
                 postingWithDiffEtat.addAll(postingsWithDiffEtat);
             }
 
-            // Paginate postings and cache them
             Utils.paginateAndCachePostings(postingRequest, homepageServiceImpl, cachedPostings, postingWithDiffEtat);
             Utils.paginateAndCachePostingsWithDiffEtat(postingRequest, postingServiceImpl, postingWithDiffEtat);
         } else {
-            // Paginate postings with different states based on the current page
             Utils.paginateAndCachePostingsWithDiffEtat(postingRequest, postingServiceImpl, postingWithDiffEtat);
         }
 
@@ -124,38 +117,32 @@ public class PostingController {
     public ResponseEntity<Map<String, Object>> getMouvements(@RequestBody MouvementRequestDTO mouvementRequest) {
         System.out.println("Received DTO: " + mouvementRequest);
 
-        // Get response from the service
+
         Map<String, Object> response = homepageServiceImpl.findMouvements(mouvementRequest);
 
         if (response == null) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
 
-        // Get mouvements from the response, default to empty list if null
         List<MouvementDTO> mouvements = (List<MouvementDTO>) response.get("mvtSearched");
         if (mouvements == null) {
             mouvements = new ArrayList<>();
         }
 
-        // Handle caching logic based on page number
         if (mouvementRequest.getPage() == 0) {
             System.out.println("First page request, clearing cache...");
 
-            // Clear the cache for the first page request
             cachedMouvements.clear();
             mvtWithEtatDiff.clear();
 
-            // Add mouvements with different states to the list
             List<MouvementDTO> mouvementsWithDiffEtat = (List<MouvementDTO>) response.get("mvtWithEtatDiff");
             if (mouvementsWithDiffEtat != null) {
                 mvtWithEtatDiff.addAll(mouvementsWithDiffEtat);
             }
 
-            // Paginate mouvements and cache them
             Utils.paginateAndCacheMouvements(mouvementRequest, homepageServiceImpl, cachedMouvements, mvtWithEtatDiff);
             Utils.paginateAndCacheMouvementsWithDiffEtat(mouvementRequest, mouvementServiceImpl, mvtWithEtatDiff);
         } else {
-            // Paginate mouvements with different states based on the current page
             Utils.paginateAndCacheMouvementsWithDiffEtat(mouvementRequest, mouvementServiceImpl, mvtWithEtatDiff);
         }
 
@@ -177,7 +164,6 @@ public class PostingController {
                 mouvementsToExport.addAll(allMouvementsWithDiffEtat);
             }
 
-            // Logging for debugging
             System.out.println("Cached Mouvements count: " + cachedMouvements.size());
             System.out.println("Mouvements with different state count: " + mvtWithEtatDiff.size());
             System.out.println("Total Mouvements to export: " + mouvementsToExport.size());
@@ -205,38 +191,32 @@ public class PostingController {
 
     System.out.println("Received DTO: " + postingCreRequestDTO);
 
-    // Get response from the service
+
     Map<String, Object> response = homepageServiceImpl.findPostingCres(postingCreRequestDTO);
 
     if (response == null) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
 
-    // Get postings from the response, default to empty list if null
     List<PostingCreDTO> postingCres = (List<PostingCreDTO>) response.get("postingCreSearched");
     if (postingCres == null) {
         postingCres = new ArrayList<>();
     }
 
-    // Handle caching logic based on page number
     if (postingCreRequestDTO.getPage() == 0) {
         System.out.println("First page request, clearing cache...");
 
-        // Clear the cache for the first page request
         cachedPostingCres.clear();
         postingCreWithDiffEtat.clear();
 
-        // Add postings with different states to the list
         List<PostingCreDTO> postingCresWithDiffEtat = (List<PostingCreDTO>) response.get("postingCreWithDiffEtat");
         if (postingCresWithDiffEtat != null) {
             postingCreWithDiffEtat.addAll(postingCresWithDiffEtat);
         }
 
-        // Paginate postings and cache them
         Utils.paginateAndCachePostingCres(postingCreRequestDTO, homepageServiceImpl, cachedPostingCres, postingCreWithDiffEtat);
         Utils.paginateAndCachePostingCresWithDiffEtat(postingCreRequestDTO, postingCreServiceImpl, postingCreWithDiffEtat);
     } else {
-        // Paginate postings with different states based on the current page
         Utils.paginateAndCachePostingCresWithDiffEtat(postingCreRequestDTO, postingCreServiceImpl, postingCreWithDiffEtat);
     }
 
@@ -257,7 +237,6 @@ public class PostingController {
                 postingCresToExport.addAll(allPostingCresWithDiffEtat);
             }
 
-            // Logging for debugging
             System.out.println("Cached postingCres count: " + cachedPostingCres.size());
             System.out.println("PostingCres with different state count: " + postingCreWithDiffEtat.size());
             System.out.println("Total postingCres to export: " + postingCresToExport.size());
