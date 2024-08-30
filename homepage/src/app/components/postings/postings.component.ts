@@ -48,7 +48,7 @@ export class PostingsComponent implements OnInit {
           } else {
             this.defaultPostings = [];
             this.totalPagesWithDiffEtat = 1;
-            this.backendErrorMessage = response.message || 'Aucun posting trouvé avec état différent.';
+            this.backendErrorMessage = response.message || 'Aucune posting trouvée avec état différent.';
           }
         }
       },
@@ -81,7 +81,7 @@ export class PostingsComponent implements OnInit {
           } else {
             this.transactionPostings = [];
             this.totalPages = 1;
-            this.backendErrorMessage = response.message || 'Aucun posting trouvé.';
+            this.backendErrorMessage = response.message || 'Aucune posting trouvé.';
             this.showError = true;
           }
         }

@@ -92,7 +92,7 @@ export class TransactionPostingsComponent {
         }
       );
     } else {
-      this.errorMessage = 'Aucun posting disponible pour effectuer la recherche.';
+      this.errorMessage = 'Aucune posting disponible pour effectuer la recherche.';
     }
   }
   exportCresToExcel() {
@@ -139,7 +139,7 @@ export class TransactionPostingsComponent {
         }
       );
     } else {
-      this.errorMessage = 'Aucun posting disponible pour effectuer la recherche.';
+      this.errorMessage = 'Aucune posting disponible pour effectuer la recherche.';
     }
   }
   exportAllDataToExcel() {
@@ -258,7 +258,7 @@ export class TransactionPostingsComponent {
         }
       );
     } else {
-      this.errorMessage = 'Aucun posting disponible pour effectuer la recherche.';
+      this.errorMessage = 'Aucune posting disponible pour effectuer la recherche.';
     }
   }
   onSelectExportOption(event: any) {
